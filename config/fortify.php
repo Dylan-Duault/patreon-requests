@@ -144,14 +144,14 @@ return [
     */
 
     'features' => [
-        Features::registration(),
-        Features::resetPasswords(),
-        Features::emailVerification(),
-        Features::twoFactorAuthentication([
-            'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0
-        ]),
+        // Registration and password features disabled - using Patreon OAuth only
+        // Features::registration(),
+        // Features::resetPasswords(),
+        // Features::emailVerification(),
+        // Features::twoFactorAuthentication([
+        //     'confirm' => true,
+        //     'confirmPassword' => true,
+        // ]),
     ],
 
 ];

@@ -32,6 +32,10 @@ export interface User {
     email: string;
     avatar?: string;
     email_verified_at: string | null;
+    is_admin: boolean;
+    is_active_patron: boolean;
+    patron_status: string | null;
+    patron_tier_cents: number;
     created_at: string;
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
