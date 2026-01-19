@@ -2,7 +2,6 @@
 import { Head, Link } from '@inertiajs/vue3';
 
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
-import { Button } from '@/components/ui/button';
 import { home } from '@/routes';
 
 defineProps<{
@@ -14,7 +13,7 @@ defineProps<{
 <template>
     <Head title="Log in" />
     <div
-        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-background p-6 md:p-10"
+        class="flex min-h-svh flex-col items-center justify-center gap-6 bg-[var(--el-bg-color)] p-6 md:p-10"
     >
         <div class="w-full max-w-sm">
             <div class="flex flex-col gap-8">
@@ -26,9 +25,7 @@ defineProps<{
                         <div
                             class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
                         >
-                            <AppLogoIcon
-                                class="size-9 fill-current text-[var(--foreground)] dark:text-white"
-                            />
+                            <AppLogoIcon class="size-9 fill-current" />
                         </div>
                         <span class="sr-only">Video Request Platform</span>
                     </Link>
@@ -36,35 +33,38 @@ defineProps<{
                         <h1 class="text-xl font-medium">
                             Welcome Back
                         </h1>
-                        <p class="text-center text-sm text-muted-foreground">
+                        <p class="text-center text-sm text-[var(--el-text-color-secondary)]">
                             Sign in with your Patreon account to request videos
                         </p>
                     </div>
                 </div>
 
-                <div
+                <el-alert
                     v-if="status"
-                    class="mb-4 rounded-md bg-green-50 p-3 text-center text-sm font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400"
-                >
-                    {{ status }}
-                </div>
+                    :title="status"
+                    type="success"
+                    :closable="false"
+                    class="mb-4"
+                />
 
-                <div
+                <el-alert
                     v-if="error"
-                    class="mb-4 rounded-md bg-red-50 p-3 text-center text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400"
-                >
-                    {{ error }}
-                </div>
+                    :title="error"
+                    type="error"
+                    :closable="false"
+                    class="mb-4"
+                />
 
-                <Button
-                    as="a"
+                <el-button
+                    type="primary"
+                    size="large"
+                    tag="a"
                     href="/auth/patreon"
-                    class="w-full gap-2"
-                    size="lg"
+                    class="w-full"
                 >
                     <svg
                         viewBox="0 0 24 24"
-                        class="h-5 w-5"
+                        class="h-5 w-5 mr-2"
                         fill="currentColor"
                     >
                         <path
@@ -72,9 +72,9 @@ defineProps<{
                         />
                     </svg>
                     Continue with Patreon
-                </Button>
+                </el-button>
 
-                <p class="text-center text-xs text-muted-foreground">
+                <p class="text-center text-xs text-[var(--el-text-color-secondary)]">
                     By continuing, you agree to authenticate via Patreon. Only
                     Patreon subscribers can request videos.
                 </p>

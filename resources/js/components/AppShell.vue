@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-
-import { SidebarProvider } from '@/components/ui/sidebar';
+import { provide, ref } from 'vue';
 
 interface Props {
     variant?: 'header' | 'sidebar';
@@ -9,14 +7,17 @@ interface Props {
 
 defineProps<Props>();
 
-const isOpen = usePage().props.sidebarOpen;
+const sidebarCollapsed = ref(false);
+const toggleSidebar = () => {
+    sidebarCollapsed.value = !sidebarCollapsed.value;
+};
+
+provide('sidebarCollapsed', sidebarCollapsed);
+provide('toggleSidebar', toggleSidebar);
 </script>
 
 <template>
-    <div v-if="variant === 'header'" class="flex min-h-screen w-full flex-col">
+    <el-container class="min-h-screen">
         <slot />
-    </div>
-    <SidebarProvider v-else :default-open="isOpen">
-        <slot />
-    </SidebarProvider>
+    </el-container>
 </template>

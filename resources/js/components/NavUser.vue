@@ -1,56 +1,60 @@
 <script setup lang="ts">
-import { usePage } from '@inertiajs/vue3';
-import { ChevronsUpDown } from 'lucide-vue-next';
+import { Link, router, usePage } from '@inertiajs/vue3';
+import { Setting, SwitchButton } from '@element-plus/icons-vue';
 
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    useSidebar,
-} from '@/components/ui/sidebar';
 import UserInfo from '@/components/UserInfo.vue';
+import { logout } from '@/routes';
+import { edit } from '@/routes/profile';
 
-import UserMenuContent from './UserMenuContent.vue';
+interface Props {
+    collapsed?: boolean;
+}
+
+defineProps<Props>();
 
 const page = usePage();
 const user = page.props.auth.user;
-const { isMobile, state } = useSidebar();
+
+const handleLogout = () => {
+    router.flushAll();
+};
 </script>
 
 <template>
-    <SidebarMenu>
-        <SidebarMenuItem>
-            <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                    <SidebarMenuButton
-                        size="lg"
-                        class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                        data-test="sidebar-menu-button"
+    <el-dropdown trigger="click" :hide-on-click="true">
+        <div class="flex w-full cursor-pointer items-center gap-2 rounded-lg p-2 hover:bg-[var(--el-fill-color-light)]">
+            <UserInfo :user="user" :show-email="!collapsed" :collapsed="collapsed" />
+        </div>
+        <template #dropdown>
+            <el-dropdown-menu>
+                <div class="px-3 py-2 border-b border-[var(--el-border-color)]">
+                    <UserInfo :user="user" :show-email="true" />
+                </div>
+                <el-dropdown-item>
+                    <Link :href="edit()" class="flex items-center gap-2 w-full" prefetch>
+                        <el-icon><Setting /></el-icon>
+                        Settings
+                    </Link>
+                </el-dropdown-item>
+                <el-dropdown-item divided>
+                    <Link
+                        :href="logout()"
+                        @click="handleLogout"
+                        as="button"
+                        class="flex items-center gap-2 w-full"
+                        data-test="logout-button"
                     >
-                        <UserInfo :user="user" />
-                        <ChevronsUpDown class="ml-auto size-4" />
-                    </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    class="w-(--reka-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                    :side="
-                        isMobile
-                            ? 'bottom'
-                            : state === 'collapsed'
-                              ? 'left'
-                              : 'bottom'
-                    "
-                    align="end"
-                    :side-offset="4"
-                >
-                    <UserMenuContent :user="user" />
-                </DropdownMenuContent>
-            </DropdownMenu>
-        </SidebarMenuItem>
-    </SidebarMenu>
+                        <el-icon><SwitchButton /></el-icon>
+                        Log out
+                    </Link>
+                </el-dropdown-item>
+            </el-dropdown-menu>
+        </template>
+    </el-dropdown>
 </template>
+
+<style scoped>
+.el-dropdown {
+    width: 100%;
+}
+</style>

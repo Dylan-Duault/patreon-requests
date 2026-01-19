@@ -1,25 +1,15 @@
 <script setup lang="ts">
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
-    CheckCircle,
+    CircleCheck,
     Clock,
-    ExternalLink,
-    ListVideo,
-    RotateCcw,
-    Video,
-} from 'lucide-vue-next';
+    Link as LinkIcon,
+    List,
+    VideoCamera,
+    RefreshLeft,
+} from '@element-plus/icons-vue';
 
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { type BreadcrumbItem } from '@/types';
 
 interface VideoRequest {
@@ -117,198 +107,200 @@ const filterUrl = (status: string) => {
             <!-- Header -->
             <div>
                 <h1 class="text-2xl font-semibold tracking-tight">Manage Requests</h1>
-                <p class="text-muted-foreground">
+                <p class="text-[var(--el-text-color-secondary)]">
                     View and manage all video requests
                 </p>
             </div>
 
             <!-- Stats -->
-            <div class="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">Total Requests</CardTitle>
-                        <ListVideo class="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
+            <el-row :gutter="16">
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Total Requests
+                            </span>
+                            <el-icon class="text-[var(--el-text-color-secondary)]">
+                                <List />
+                            </el-icon>
+                        </div>
                         <div class="text-2xl font-bold">{{ stats.total }}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">Pending</CardTitle>
-                        <Clock class="h-4 w-4 text-yellow-500" />
-                    </CardHeader>
-                    <CardContent>
+                    </el-card>
+                </el-col>
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Pending
+                            </span>
+                            <el-icon class="text-[var(--el-color-warning)]">
+                                <Clock />
+                            </el-icon>
+                        </div>
                         <div class="text-2xl font-bold">{{ stats.pending }}</div>
-                    </CardContent>
-                </Card>
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">Completed</CardTitle>
-                        <CheckCircle class="h-4 w-4 text-green-500" />
-                    </CardHeader>
-                    <CardContent>
+                    </el-card>
+                </el-col>
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Completed
+                            </span>
+                            <el-icon class="text-[var(--el-color-success)]">
+                                <CircleCheck />
+                            </el-icon>
+                        </div>
                         <div class="text-2xl font-bold">{{ stats.done }}</div>
-                    </CardContent>
-                </Card>
-            </div>
+                    </el-card>
+                </el-col>
+            </el-row>
 
             <!-- Filters -->
             <div class="flex gap-2">
-                <Button
-                    :variant="currentFilter === 'all' ? 'default' : 'outline'"
-                    size="sm"
-                    as-child
-                >
+                <el-button :type="currentFilter === 'all' ? 'primary' : 'default'" size="small">
                     <Link :href="filterUrl('all')">All</Link>
-                </Button>
-                <Button
-                    :variant="currentFilter === 'pending' ? 'default' : 'outline'"
-                    size="sm"
-                    as-child
-                >
+                </el-button>
+                <el-button :type="currentFilter === 'pending' ? 'primary' : 'default'" size="small">
                     <Link :href="filterUrl('pending')">Pending</Link>
-                </Button>
-                <Button
-                    :variant="currentFilter === 'done' ? 'default' : 'outline'"
-                    size="sm"
-                    as-child
-                >
+                </el-button>
+                <el-button :type="currentFilter === 'done' ? 'primary' : 'default'" size="small">
                     <Link :href="filterUrl('done')">Completed</Link>
-                </Button>
+                </el-button>
             </div>
 
             <!-- Flash Messages -->
-            <div
+            <el-alert
                 v-if="page.props.flash?.success"
-                class="rounded-md bg-green-50 p-3 text-sm font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400"
-            >
-                {{ page.props.flash.success }}
-            </div>
+                :title="page.props.flash.success"
+                type="success"
+                :closable="true"
+            />
 
             <!-- Requests Table -->
-            <Card v-if="requests.length > 0">
-                <CardHeader>
-                    <CardTitle>Video Requests</CardTitle>
-                    <CardDescription>
-                        {{ requests.length }} request{{ requests.length !== 1 ? 's' : '' }}
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div class="space-y-4">
-                        <div
-                            v-for="request in requests"
-                            :key="request.id"
-                            class="flex items-start gap-4 rounded-lg border p-4"
+            <el-card v-if="requests.length > 0" shadow="never">
+                <template #header>
+                    <div>
+                        <h3 class="text-lg font-semibold">Video Requests</h3>
+                        <p class="text-sm text-[var(--el-text-color-secondary)]">
+                            {{ requests.length }} request{{ requests.length !== 1 ? 's' : '' }}
+                        </p>
+                    </div>
+                </template>
+
+                <div class="space-y-4">
+                    <div
+                        v-for="request in requests"
+                        :key="request.id"
+                        class="flex items-start gap-4 rounded-lg border border-[var(--el-border-color)] p-4"
+                    >
+                        <!-- Thumbnail -->
+                        <a
+                            :href="request.youtube_url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="relative flex-shrink-0 group"
                         >
-                            <!-- Thumbnail -->
-                            <a
-                                :href="request.youtube_url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="relative flex-shrink-0 group"
+                            <img
+                                v-if="request.thumbnail"
+                                :src="request.thumbnail"
+                                :alt="request.title || 'Video thumbnail'"
+                                class="h-24 w-44 rounded object-cover"
+                            />
+                            <div
+                                v-else
+                                class="flex h-24 w-44 items-center justify-center rounded bg-[var(--el-fill-color)]"
                             >
-                                <img
-                                    v-if="request.thumbnail"
-                                    :src="request.thumbnail"
-                                    :alt="request.title || 'Video thumbnail'"
-                                    class="h-24 w-44 rounded object-cover"
-                                />
-                                <div
-                                    v-else
-                                    class="flex h-24 w-44 items-center justify-center rounded bg-muted"
-                                >
-                                    <Video class="h-8 w-8 text-muted-foreground" />
-                                </div>
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
-                                    <ExternalLink class="h-6 w-6 text-white" />
-                                </div>
-                            </a>
+                                <el-icon :size="32" class="text-[var(--el-text-color-secondary)]">
+                                    <VideoCamera />
+                                </el-icon>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
+                                <el-icon :size="24" class="text-white">
+                                    <LinkIcon />
+                                </el-icon>
+                            </div>
+                        </a>
 
-                            <!-- Content -->
-                            <div class="flex-1 min-w-0 space-y-2">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div>
-                                        <a
-                                            :href="request.youtube_url"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            class="font-medium hover:underline line-clamp-1"
-                                        >
-                                            {{ request.title || 'Untitled Video' }}
-                                        </a>
-                                        <p class="text-sm text-muted-foreground">
-                                            Requested {{ formatDate(request.requested_at) }}
-                                        </p>
-                                    </div>
-                                    <Badge
-                                        :variant="request.status === 'done' ? 'default' : 'secondary'"
-                                    >
-                                        {{ request.status === 'done' ? 'Completed' : 'Pending' }}
-                                    </Badge>
-                                </div>
-
-                                <!-- User Info -->
-                                <div class="flex items-center gap-2 text-sm">
-                                    <Avatar class="h-6 w-6">
-                                        <AvatarImage
-                                            v-if="request.user.avatar"
-                                            :src="request.user.avatar"
-                                            :alt="request.user.name"
-                                        />
-                                        <AvatarFallback class="text-xs">
-                                            {{ getInitials(request.user.name) }}
-                                        </AvatarFallback>
-                                    </Avatar>
-                                    <span>{{ request.user.name }}</span>
-                                    <span class="text-muted-foreground">({{ request.user.email }})</span>
-                                    <Badge variant="outline" class="ml-auto">
-                                        {{ formatTier(request.user.tier_cents) }}/month
-                                    </Badge>
-                                </div>
-
-                                <!-- Actions -->
-                                <div class="flex gap-2 pt-2">
-                                    <Button
-                                        v-if="request.status === 'pending'"
-                                        size="sm"
-                                        @click="markAsDone(request.id)"
-                                    >
-                                        <CheckCircle class="mr-2 h-4 w-4" />
-                                        Mark Done
-                                    </Button>
-                                    <Button
-                                        v-else
-                                        variant="outline"
-                                        size="sm"
-                                        @click="markAsPending(request.id)"
-                                    >
-                                        <RotateCcw class="mr-2 h-4 w-4" />
-                                        Revert to Pending
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="sm"
-                                        as="a"
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0 space-y-2">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <a
                                         :href="request.youtube_url"
                                         target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="font-medium hover:underline line-clamp-1"
                                     >
-                                        <ExternalLink class="mr-2 h-4 w-4" />
-                                        Watch Video
-                                    </Button>
+                                        {{ request.title || 'Untitled Video' }}
+                                    </a>
+                                    <p class="text-sm text-[var(--el-text-color-secondary)]">
+                                        Requested {{ formatDate(request.requested_at) }}
+                                    </p>
                                 </div>
+                                <el-tag :type="request.status === 'done' ? 'success' : 'info'">
+                                    {{ request.status === 'done' ? 'Completed' : 'Pending' }}
+                                </el-tag>
+                            </div>
+
+                            <!-- User Info -->
+                            <div class="flex items-center gap-2 text-sm">
+                                <el-avatar
+                                    :size="24"
+                                    :src="request.user.avatar || undefined"
+                                >
+                                    {{ getInitials(request.user.name) }}
+                                </el-avatar>
+                                <span>{{ request.user.name }}</span>
+                                <span class="text-[var(--el-text-color-secondary)]">({{ request.user.email }})</span>
+                                <el-tag class="ml-auto" size="small">
+                                    {{ formatTier(request.user.tier_cents) }}/month
+                                </el-tag>
+                            </div>
+
+                            <!-- Actions -->
+                            <div class="flex gap-2 pt-2">
+                                <el-button
+                                    v-if="request.status === 'pending'"
+                                    type="primary"
+                                    size="small"
+                                    @click="markAsDone(request.id)"
+                                >
+                                    <el-icon class="mr-1"><CircleCheck /></el-icon>
+                                    Mark Done
+                                </el-button>
+                                <el-button
+                                    v-else
+                                    size="small"
+                                    @click="markAsPending(request.id)"
+                                >
+                                    <el-icon class="mr-1"><RefreshLeft /></el-icon>
+                                    Revert to Pending
+                                </el-button>
+                                <el-button
+                                    size="small"
+                                    text
+                                    tag="a"
+                                    :href="request.youtube_url"
+                                    target="_blank"
+                                >
+                                    <el-icon class="mr-1"><LinkIcon /></el-icon>
+                                    Watch Video
+                                </el-button>
                             </div>
                         </div>
                     </div>
-                </CardContent>
-            </Card>
+                </div>
+            </el-card>
 
             <!-- Empty State -->
-            <Card v-else>
-                <CardContent class="flex flex-col items-center justify-center py-12">
-                    <ListVideo class="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 class="text-lg font-medium mb-2">No requests found</h3>
-                    <p class="text-muted-foreground text-center">
+            <el-card v-else shadow="never">
+                <el-empty description="No requests found">
+                    <template #image>
+                        <el-icon :size="48" class="text-[var(--el-text-color-secondary)]">
+                            <List />
+                        </el-icon>
+                    </template>
+                    <p class="text-[var(--el-text-color-secondary)]">
                         <template v-if="currentFilter !== 'all'">
                             No {{ currentFilter }} requests. Try a different filter.
                         </template>
@@ -316,8 +308,8 @@ const filterUrl = (status: string) => {
                             No video requests have been submitted yet.
                         </template>
                     </p>
-                </CardContent>
-            </Card>
+                </el-empty>
+            </el-card>
         </div>
     </AppLayout>
 </template>

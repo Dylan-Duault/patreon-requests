@@ -2,8 +2,6 @@
 import { Link } from '@inertiajs/vue3';
 
 import Heading from '@/components/Heading.vue';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { useActiveUrl } from '@/composables/useActiveUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
@@ -33,29 +31,23 @@ const { urlIsActive } = useActiveUrl();
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
-                <nav
-                    class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Settings"
+                <el-menu
+                    class="settings-menu border-none"
+                    :default-active="sidebarNavItems.find(item => urlIsActive(item.href))?.title"
                 >
-                    <Button
+                    <el-menu-item
                         v-for="item in sidebarNavItems"
                         :key="toUrl(item.href)"
-                        variant="ghost"
-                        :class="[
-                            'w-full justify-start',
-                            { 'bg-muted': urlIsActive(item.href) },
-                        ]"
-                        as-child
+                        :index="item.title"
                     >
-                        <Link :href="item.href">
-                            <component :is="item.icon" class="h-4 w-4" />
+                        <Link :href="item.href" class="w-full">
                             {{ item.title }}
                         </Link>
-                    </Button>
-                </nav>
+                    </el-menu-item>
+                </el-menu>
             </aside>
 
-            <Separator class="my-6 lg:hidden" />
+            <el-divider class="my-6 lg:hidden" />
 
             <div class="flex-1 md:max-w-2xl">
                 <section class="max-w-xl space-y-12">
@@ -65,3 +57,20 @@ const { urlIsActive } = useActiveUrl();
         </div>
     </div>
 </template>
+
+<style scoped>
+.settings-menu {
+    --el-menu-bg-color: transparent;
+}
+
+.settings-menu .el-menu-item {
+    height: auto;
+    line-height: normal;
+    padding: 0 !important;
+}
+
+.settings-menu .el-menu-item a {
+    display: block;
+    padding: 10px 16px;
+}
+</style>

@@ -5,9 +5,6 @@ import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileCo
 import DeleteUser from '@/components/DeleteUser.vue';
 import HeadingSmall from '@/components/HeadingSmall.vue';
 import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/AppLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { edit } from '@/routes/profile';
@@ -48,11 +45,9 @@ const user = page.props.auth.user;
                     class="space-y-6"
                     v-slot="{ errors, processing, recentlySuccessful }"
                 >
-                    <div class="grid gap-2">
-                        <Label for="name">Name</Label>
-                        <Input
+                    <el-form-item label="Name">
+                        <el-input
                             id="name"
-                            class="mt-1 block w-full"
                             name="name"
                             :default-value="user.name"
                             required
@@ -60,14 +55,12 @@ const user = page.props.auth.user;
                             placeholder="Full name"
                         />
                         <InputError class="mt-2" :message="errors.name" />
-                    </div>
+                    </el-form-item>
 
-                    <div class="grid gap-2">
-                        <Label for="email">Email address</Label>
-                        <Input
+                    <el-form-item label="Email address">
+                        <el-input
                             id="email"
                             type="email"
-                            class="mt-1 block w-full"
                             name="email"
                             :default-value="user.email"
                             required
@@ -75,14 +68,17 @@ const user = page.props.auth.user;
                             placeholder="Email address"
                         />
                         <InputError class="mt-2" :message="errors.email" />
-                    </div>
+                    </el-form-item>
 
                     <div class="flex items-center gap-4">
-                        <Button
-                            :disabled="processing"
+                        <el-button
+                            type="primary"
+                            native-type="submit"
+                            :loading="processing"
                             data-test="update-profile-button"
-                            >Save</Button
                         >
+                            Save
+                        </el-button>
 
                         <Transition
                             enter-active-class="transition ease-in-out"
@@ -92,7 +88,7 @@ const user = page.props.auth.user;
                         >
                             <p
                                 v-show="recentlySuccessful"
-                                class="text-sm text-neutral-600"
+                                class="text-sm text-[var(--el-color-success)]"
                             >
                                 Saved.
                             </p>

@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { CheckCircle, Clock, ExternalLink, Film, Plus, Video } from 'lucide-vue-next';
+import {
+    CircleCheck,
+    Clock,
+    Link as LinkIcon,
+    VideoCamera,
+    Plus,
+} from '@element-plus/icons-vue';
 
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
 import { type BreadcrumbItem } from '@/types';
 
 interface VideoRequest {
@@ -64,7 +61,7 @@ const formatTier = (cents: number) => {
                 <h1 class="text-2xl font-semibold tracking-tight">
                     Welcome back, {{ page.props.auth.user?.name }}!
                 </h1>
-                <p class="text-muted-foreground">
+                <p class="text-[var(--el-text-color-secondary)]">
                     <template v-if="isActivePatron">
                         You're an active patron at the {{ formatTier(tierCents) }} tier.
                     </template>
@@ -75,163 +72,171 @@ const formatTier = (cents: number) => {
             </div>
 
             <!-- Stats Cards -->
-            <div class="grid gap-4 md:grid-cols-3">
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">
-                            Patron Status
-                        </CardTitle>
-                        <CheckCircle
-                            v-if="isActivePatron"
-                            class="h-4 w-4 text-green-500"
-                        />
-                        <Clock v-else class="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">
-                            <Badge
-                                :variant="isActivePatron ? 'default' : 'secondary'"
-                            >
-                                {{ isActivePatron ? 'Active' : 'Inactive' }}
-                            </Badge>
+            <el-row :gutter="16">
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Patron Status
+                            </span>
+                            <el-icon v-if="isActivePatron" class="text-[var(--el-color-success)]">
+                                <CircleCheck />
+                            </el-icon>
+                            <el-icon v-else class="text-[var(--el-text-color-secondary)]">
+                                <Clock />
+                            </el-icon>
                         </div>
-                        <p class="text-xs text-muted-foreground mt-1">
+                        <div class="text-2xl font-bold mb-1">
+                            <el-tag :type="isActivePatron ? 'success' : 'info'">
+                                {{ isActivePatron ? 'Active' : 'Inactive' }}
+                            </el-tag>
+                        </div>
+                        <p class="text-xs text-[var(--el-text-color-secondary)]">
                             {{ tierCents > 0 ? formatTier(tierCents) + '/month' : 'No active tier' }}
                         </p>
-                    </CardContent>
-                </Card>
+                    </el-card>
+                </el-col>
 
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">
-                            Monthly Limit
-                        </CardTitle>
-                        <Video class="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Monthly Limit
+                            </span>
+                            <el-icon class="text-[var(--el-text-color-secondary)]">
+                                <VideoCamera />
+                            </el-icon>
+                        </div>
+                        <div class="text-2xl font-bold mb-1">
                             {{ monthlyLimit }}
                         </div>
-                        <p class="text-xs text-muted-foreground mt-1">
+                        <p class="text-xs text-[var(--el-text-color-secondary)]">
                             requests per month
                         </p>
-                    </CardContent>
-                </Card>
+                    </el-card>
+                </el-col>
 
-                <Card>
-                    <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle class="text-sm font-medium">
-                            Remaining This Month
-                        </CardTitle>
-                        <Film class="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                        <div class="text-2xl font-bold">
+                <el-col :xs="24" :md="8">
+                    <el-card shadow="never">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-[var(--el-text-color-secondary)]">
+                                Remaining This Month
+                            </span>
+                            <el-icon class="text-[var(--el-text-color-secondary)]">
+                                <VideoCamera />
+                            </el-icon>
+                        </div>
+                        <div class="text-2xl font-bold mb-1">
                             {{ remainingRequests }}
                         </div>
-                        <p class="text-xs text-muted-foreground mt-1">
+                        <p class="text-xs text-[var(--el-text-color-secondary)]">
                             requests available
                         </p>
-                    </CardContent>
-                </Card>
-            </div>
+                    </el-card>
+                </el-col>
+            </el-row>
 
             <!-- Quick Actions -->
             <div class="flex gap-3">
-                <Button v-if="isActivePatron && remainingRequests > 0" as-child>
-                    <Link href="/requests/new">
-                        <Plus class="mr-2 h-4 w-4" />
+                <el-button v-if="isActivePatron && remainingRequests > 0" type="primary">
+                    <Link href="/requests/new" class="flex items-center gap-2">
+                        <el-icon><Plus /></el-icon>
                         Request a Video
                     </Link>
-                </Button>
-                <Button v-else-if="!isActivePatron" as-child>
+                </el-button>
+                <el-button v-else-if="!isActivePatron" type="primary">
                     <Link href="/subscribe">
                         Subscribe to Request
                     </Link>
-                </Button>
-                <Button variant="outline" as-child v-if="isActivePatron">
+                </el-button>
+                <el-button v-if="isActivePatron">
                     <Link href="/requests">
                         View Queue
                     </Link>
-                </Button>
+                </el-button>
             </div>
 
             <!-- Recent Requests -->
-            <Card v-if="recentRequests.length > 0">
-                <CardHeader>
-                    <CardTitle>Your Recent Requests</CardTitle>
-                    <CardDescription>
-                        Your latest video requests and their status
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <div class="space-y-4">
+            <el-card v-if="recentRequests.length > 0" shadow="never">
+                <template #header>
+                    <div>
+                        <h3 class="text-lg font-semibold">Your Recent Requests</h3>
+                        <p class="text-sm text-[var(--el-text-color-secondary)]">
+                            Your latest video requests and their status
+                        </p>
+                    </div>
+                </template>
+
+                <div class="space-y-4">
+                    <div
+                        v-for="request in recentRequests"
+                        :key="request.id"
+                        class="flex items-center gap-4"
+                    >
+                        <img
+                            v-if="request.thumbnail"
+                            :src="request.thumbnail"
+                            :alt="request.title || 'Video thumbnail'"
+                            class="h-16 w-28 rounded object-cover"
+                        />
                         <div
-                            v-for="request in recentRequests"
-                            :key="request.id"
-                            class="flex items-center gap-4"
+                            v-else
+                            class="flex h-16 w-28 items-center justify-center rounded bg-[var(--el-fill-color)]"
                         >
-                            <img
-                                v-if="request.thumbnail"
-                                :src="request.thumbnail"
-                                :alt="request.title || 'Video thumbnail'"
-                                class="h-16 w-28 rounded object-cover"
-                            />
-                            <div
-                                v-else
-                                class="flex h-16 w-28 items-center justify-center rounded bg-muted"
-                            >
-                                <Video class="h-6 w-6 text-muted-foreground" />
-                            </div>
-                            <div class="flex-1 min-w-0">
-                                <p class="font-medium truncate">
-                                    {{ request.title || 'Untitled Video' }}
-                                </p>
-                                <p class="text-sm text-muted-foreground">
-                                    Requested {{ formatDate(request.requested_at) }}
-                                </p>
-                            </div>
-                            <Badge
-                                :variant="request.status === 'done' ? 'default' : 'secondary'"
-                            >
-                                {{ request.status === 'done' ? 'Completed' : 'Pending' }}
-                            </Badge>
-                            <a
-                                :href="request.youtube_url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-muted-foreground hover:text-foreground"
-                            >
-                                <ExternalLink class="h-4 w-4" />
-                            </a>
+                            <el-icon :size="24" class="text-[var(--el-text-color-secondary)]">
+                                <VideoCamera />
+                            </el-icon>
                         </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium truncate">
+                                {{ request.title || 'Untitled Video' }}
+                            </p>
+                            <p class="text-sm text-[var(--el-text-color-secondary)]">
+                                Requested {{ formatDate(request.requested_at) }}
+                            </p>
+                        </div>
+                        <el-tag :type="request.status === 'done' ? 'success' : 'info'">
+                            {{ request.status === 'done' ? 'Completed' : 'Pending' }}
+                        </el-tag>
+                        <a
+                            :href="request.youtube_url"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-[var(--el-text-color-secondary)] hover:text-[var(--el-color-primary)]"
+                        >
+                            <el-icon><LinkIcon /></el-icon>
+                        </a>
                     </div>
-                    <div class="mt-4 pt-4 border-t">
-                        <Button variant="ghost" as-child class="w-full">
-                            <Link href="/my-requests">
-                                View All Requests
-                            </Link>
-                        </Button>
-                    </div>
-                </CardContent>
-            </Card>
+                </div>
+
+                <el-divider />
+
+                <el-button text class="w-full">
+                    <Link href="/my-requests">
+                        View All Requests
+                    </Link>
+                </el-button>
+            </el-card>
 
             <!-- Empty State -->
-            <Card v-else-if="isActivePatron">
-                <CardContent class="flex flex-col items-center justify-center py-12">
-                    <Video class="h-12 w-12 text-muted-foreground mb-4" />
-                    <h3 class="text-lg font-medium mb-2">No requests yet</h3>
-                    <p class="text-muted-foreground text-center mb-4">
+            <el-card v-else-if="isActivePatron" shadow="never">
+                <el-empty description="No requests yet">
+                    <template #image>
+                        <el-icon :size="48" class="text-[var(--el-text-color-secondary)]">
+                            <VideoCamera />
+                        </el-icon>
+                    </template>
+                    <p class="text-[var(--el-text-color-secondary)] mb-4">
                         You haven't requested any videos yet. Start by requesting your first video!
                     </p>
-                    <Button as-child>
-                        <Link href="/requests/new">
-                            <Plus class="mr-2 h-4 w-4" />
+                    <el-button type="primary">
+                        <Link href="/requests/new" class="flex items-center gap-2">
+                            <el-icon><Plus /></el-icon>
                             Request a Video
                         </Link>
-                    </Button>
-                </CardContent>
-            </Card>
+                    </el-button>
+                </el-empty>
+            </el-card>
         </div>
     </AppLayout>
 </template>

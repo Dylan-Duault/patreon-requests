@@ -1,6 +1,9 @@
 import '../css/app.css';
+import 'element-plus/dist/index.css';
+import 'element-plus/theme-chalk/dark/css-vars.css';
 
 import { createInertiaApp } from '@inertiajs/vue3';
+import ElementPlus from 'element-plus';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
@@ -19,6 +22,7 @@ createInertiaApp({
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
+            .use(ElementPlus)
             .mount(el);
     },
     progress: {
