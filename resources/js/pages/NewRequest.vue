@@ -16,6 +16,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import { Textarea } from '@/components/ui/textarea';
 import { type BreadcrumbItem } from '@/types';
 
 defineProps<{
@@ -40,6 +41,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 const form = useForm({
     youtube_url: '',
+    context: '',
 });
 
 const submit = () => {
@@ -70,8 +72,7 @@ const submit = () => {
                         <Alert class="mb-6">
                             <AlertCircle class="h-4 w-4" />
                             <AlertDescription>
-                                You have <strong>{{ remainingRequests }}</strong> of
-                                <strong>{{ monthlyLimit }}</strong> requests remaining this month.
+                                You have <strong>{{ remainingRequests }}</strong> of <strong>{{ monthlyLimit }}</strong> requests remaining this month.
                             </AlertDescription>
                         </Alert>
 
@@ -90,6 +91,21 @@ const submit = () => {
                                 <InputError :message="form.errors.youtube_url" />
                                 <p class="text-xs text-muted-foreground">
                                     Supported formats: youtube.com/watch, youtu.be, youtube.com/shorts
+                                </p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <Label for="context">Context <span class="text-muted-foreground font-normal">(optional)</span></Label>
+                                <Textarea
+                                    id="context"
+                                    v-model="form.context"
+                                    placeholder="What is this video about? Any specific part you want me to react to?"
+                                    :disabled="form.processing"
+                                    class="min-h-[100px]"
+                                />
+                                <InputError :message="form.errors.context" />
+                                <p class="text-xs text-muted-foreground">
+                                    Add any helpful information about the video (max 500 characters)
                                 </p>
                             </div>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { ExternalLink, Sparkles } from 'lucide-vue-next';
+import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
+import { ExternalLink, RefreshCw, Sparkles } from 'lucide-vue-next';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Button } from '@/components/ui/button';
@@ -18,10 +19,55 @@ interface TierInfo {
     requests_per_month: number;
 }
 
-defineProps<{
+const props = defineProps<{
     tiers: TierInfo[];
     subscribeUrl: string;
+    cooldownRemaining: number;
 }>();
+
+const page = usePage();
+const cooldown = ref(props.cooldownRemaining);
+let cooldownInterval: ReturnType<typeof setInterval> | null = null;
+
+const form = useForm({});
+
+const refreshSubscription = () => {
+    if (cooldown.value > 0) return;
+
+    form.post('/subscribe/refresh', {
+        preserveScroll: true,
+        onSuccess: () => {
+            cooldown.value = 15;
+            startCooldownTimer();
+        },
+    });
+};
+
+const startCooldownTimer = () => {
+    if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+    }
+    cooldownInterval = setInterval(() => {
+        if (cooldown.value > 0) {
+            cooldown.value--;
+        } else if (cooldownInterval) {
+            clearInterval(cooldownInterval);
+            cooldownInterval = null;
+        }
+    }, 1000);
+};
+
+onMounted(() => {
+    if (cooldown.value > 0) {
+        startCooldownTimer();
+    }
+});
+
+onUnmounted(() => {
+    if (cooldownInterval) {
+        clearInterval(cooldownInterval);
+    }
+});
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -79,6 +125,40 @@ const breadcrumbs: BreadcrumbItem[] = [
                                 </Link>
                             </Button>
                         </div>
+                    </CardContent>
+                </Card>
+
+                <!-- Just Subscribed Card -->
+                <Card class="mt-4">
+                    <CardHeader class="pb-3">
+                        <CardTitle class="text-lg">Just subscribed?</CardTitle>
+                        <CardDescription>
+                            If you just completed your subscription, click below to refresh your status.
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <!-- Flash Messages -->
+                        <div
+                            v-if="page.props.flash?.error"
+                            class="mb-4 rounded-md bg-red-50 p-3 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400"
+                        >
+                            {{ page.props.flash.error }}
+                        </div>
+
+                        <Button
+                            @click="refreshSubscription"
+                            :disabled="form.processing || cooldown > 0"
+                            variant="outline"
+                            class="w-full gap-2"
+                        >
+                            <RefreshCw
+                                class="h-4 w-4"
+                                :class="{ 'animate-spin': form.processing }"
+                            />
+                            <span v-if="form.processing">Checking...</span>
+                            <span v-else-if="cooldown > 0">Wait {{ cooldown }}s</span>
+                            <span v-else>Refresh subscription status</span>
+                        </Button>
                     </CardContent>
                 </Card>
             </div>

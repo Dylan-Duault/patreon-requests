@@ -28,6 +28,7 @@ interface VideoRequest {
     thumbnail: string | null;
     youtube_url: string;
     youtube_video_id: string;
+    context: string | null;
     status: 'pending' | 'done';
     requested_at: string;
     completed_at: string | null;
@@ -265,6 +266,15 @@ const filterUrl = (status: string) => {
                                     <Badge variant="outline" class="ml-auto">
                                         {{ formatTier(request.user.tier_cents) }}/month
                                     </Badge>
+                                </div>
+
+                                <!-- Context -->
+                                <div
+                                    v-if="request.context"
+                                    class="rounded-md bg-muted/50 p-3 text-sm"
+                                >
+                                    <p class="text-xs font-medium text-muted-foreground mb-1">Context</p>
+                                    <p class="whitespace-pre-wrap">{{ request.context }}</p>
                                 </div>
 
                                 <!-- Actions -->

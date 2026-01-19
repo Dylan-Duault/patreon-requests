@@ -28,7 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
     // Subscribe page (for non-patrons)
-    Route::get('/subscribe', SubscribeController::class)->name('subscribe');
+    Route::get('/subscribe', [SubscribeController::class, 'index'])->name('subscribe');
+    Route::post('/subscribe/refresh', [SubscribeController::class, 'refresh'])->name('subscribe.refresh');
 
     // Logout
     Route::post('/logout', [PatreonController::class, 'logout'])->name('logout');

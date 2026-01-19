@@ -5,12 +5,10 @@ import { ExternalLink, ListVideo, Plus, Video } from 'lucide-vue-next';
 const page = usePage();
 
 import AppLayout from '@/layouts/AppLayout.vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
     Card,
     CardContent,
-    CardDescription,
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
@@ -23,10 +21,6 @@ interface VideoRequest {
     youtube_url: string;
     youtube_video_id: string;
     requested_at: string;
-    user: {
-        name: string;
-        avatar: string | null;
-    };
 }
 
 defineProps<{
@@ -51,15 +45,6 @@ const formatDate = (dateString: string) => {
         year: 'numeric',
     });
 };
-
-const getInitials = (name: string) => {
-    return name
-        .split(' ')
-        .map((n) => n[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
-};
 </script>
 
 <template>
@@ -72,7 +57,7 @@ const getInitials = (name: string) => {
                 <div>
                     <h1 class="text-2xl font-semibold tracking-tight">Video Queue</h1>
                     <p class="text-muted-foreground">
-                        Pending videos in chronological order (FIFO)
+                        All video requests waiting to be reacted to, handled in chronological order.
                     </p>
                 </div>
                 <Button as-child>
@@ -104,9 +89,6 @@ const getInitials = (name: string) => {
                         <ListVideo class="h-5 w-5" />
                         Pending Requests ({{ requests.length }})
                     </CardTitle>
-                    <CardDescription>
-                        Videos are watched in the order they were requested
-                    </CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div class="space-y-4">
@@ -152,21 +134,6 @@ const getInitials = (name: string) => {
                                 <p class="text-sm text-muted-foreground mt-1">
                                     Requested {{ formatDate(request.requested_at) }}
                                 </p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <Avatar class="h-8 w-8">
-                                    <AvatarImage
-                                        v-if="request.user.avatar"
-                                        :src="request.user.avatar"
-                                        :alt="request.user.name"
-                                    />
-                                    <AvatarFallback>
-                                        {{ getInitials(request.user.name) }}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <span class="text-sm text-muted-foreground hidden sm:inline">
-                                    {{ request.user.name }}
-                                </span>
                             </div>
                         </div>
                     </div>

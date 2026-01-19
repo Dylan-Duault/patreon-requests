@@ -20,8 +20,7 @@ class VideoRequestController extends Controller
      */
     public function index(): Response
     {
-        $requests = VideoRequest::with('user:id,name,avatar')
-            ->pending()
+        $requests = VideoRequest::pending()
             ->chronological()
             ->get()
             ->map(fn ($request) => [
@@ -31,10 +30,6 @@ class VideoRequestController extends Controller
                 'youtube_url' => $request->youtube_url,
                 'youtube_video_id' => $request->youtube_video_id,
                 'requested_at' => $request->requested_at->toISOString(),
-                'user' => [
-                    'name' => $request->user->name,
-                    'avatar' => $request->user->avatar,
-                ],
             ]);
 
         return Inertia::render('Queue', [
@@ -80,20 +75,25 @@ class VideoRequestController extends Controller
                     $fail('Please enter a valid YouTube URL.');
                 }
             }],
+            'context' => ['nullable', 'string', 'max:500'],
         ]);
 
         $videoId = $this->youtubeService->extractVideoId($validated['youtube_url']);
         $videoInfo = $this->youtubeService->getVideoInfo($videoId);
         $normalizedUrl = $this->youtubeService->normalizeUrl($validated['youtube_url']);
 
-        // Check for duplicate pending requests
-        $existingRequest = VideoRequest::where('youtube_video_id', $videoId)
-            ->pending()
-            ->first();
+        // Check for existing requests
+        $existingRequest = VideoRequest::where('youtube_video_id', $videoId)->first();
 
         if ($existingRequest) {
+            if ($existingRequest->isPending()) {
+                return back()->withErrors([
+                    'youtube_url' => 'This video has already been requested and is in the queue.',
+                ]);
+            }
+
             return back()->withErrors([
-                'youtube_url' => 'This video has already been requested and is in the queue.',
+                'youtube_url' => 'This video has already been requested and was completed.',
             ]);
         }
 
@@ -103,6 +103,7 @@ class VideoRequestController extends Controller
             'youtube_video_id' => $videoId,
             'title' => $videoInfo['title'] ?? null,
             'thumbnail' => $videoInfo['thumbnail'] ?? null,
+            'context' => $validated['context'] ?? null,
             'status' => 'pending',
             'requested_at' => now(),
         ]);
