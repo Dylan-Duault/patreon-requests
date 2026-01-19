@@ -23,6 +23,7 @@ class SubscribeController extends Controller
 
         return Inertia::render('Subscribe', [
             'tiers' => $tierInfo,
+            'subscribeUrl' => config('patreon.subscribe_url'),
         ]);
     }
 }

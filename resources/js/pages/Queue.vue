@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { ExternalLink, ListVideo, Plus, Video } from 'lucide-vue-next';
+
+const page = usePage();
 
 import AppLayout from '@/layouts/AppLayout.vue';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -79,6 +81,20 @@ const getInitials = (name: string) => {
                         Request Video
                     </Link>
                 </Button>
+            </div>
+
+            <!-- Flash Messages -->
+            <div
+                v-if="page.props.flash?.error"
+                class="rounded-md bg-red-50 p-3 text-sm font-medium text-red-600 dark:bg-red-900/20 dark:text-red-400"
+            >
+                {{ page.props.flash.error }}
+            </div>
+            <div
+                v-if="page.props.flash?.success"
+                class="rounded-md bg-green-50 p-3 text-sm font-medium text-green-600 dark:bg-green-900/20 dark:text-green-400"
+            >
+                {{ page.props.flash.success }}
             </div>
 
             <!-- Queue List -->

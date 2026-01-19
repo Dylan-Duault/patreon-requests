@@ -26,6 +26,9 @@ PATREON_CLIENT_SECRET=your_client_secret
 PATREON_REDIRECT_URI=http://localhost:8000/auth/patreon/callback
 PATREON_CAMPAIGN_ID=your_campaign_id
 
+# Patreon Subscribe URL (Required)
+PATREON_SUBSCRIBE_URL=https://www.patreon.com/c/yourcreatorname
+
 # Patreon Webhook (Optional but recommended)
 PATREON_WEBHOOK_SECRET=your_webhook_secret
 ```

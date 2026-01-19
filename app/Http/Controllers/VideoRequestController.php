@@ -45,15 +45,16 @@ class VideoRequestController extends Controller
     /**
      * Show the form to create a new request.
      */
-    public function create(Request $request): Response|RedirectResponse
+    public function create(Request $request): Response
     {
         $user = $request->user();
 
         if (! $user->canMakeRequest()) {
-            return redirect()->route('requests.index')
-                ->with('error', 'You have reached your monthly request limit.');
+            return Inertia::render('RequestLimitReached', [
+                'monthlyLimit' => $user->getMonthlyRequestLimit(),
+            ]);
         }
-        
+
         return Inertia::render('NewRequest', [
             'remainingRequests' => $user->getRemainingRequests(),
             'monthlyLimit' => $user->getMonthlyRequestLimit(),

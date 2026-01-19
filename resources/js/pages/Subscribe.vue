@@ -20,6 +20,7 @@ interface TierInfo {
 
 defineProps<{
     tiers: TierInfo[];
+    subscribeUrl: string;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -50,52 +51,11 @@ const breadcrumbs: BreadcrumbItem[] = [
                             Become a Patreon supporter to request YouTube videos for me to react to!
                         </CardDescription>
                     </CardHeader>
-                    <CardContent class="space-y-6">
-                        <!-- Tier Information -->
-                        <div class="grid gap-4 md:grid-cols-2" v-if="tiers.length > 0">
-                            <div
-                                v-for="(tier, index) in tiers"
-                                :key="index"
-                                class="rounded-lg border p-4 text-center"
-                            >
-                                <div class="text-2xl font-bold text-primary">
-                                    {{ tier.amount }}
-                                </div>
-                                <div class="text-sm text-muted-foreground">per month</div>
-                                <div class="mt-2 font-medium">
-                                    {{ tier.requests_per_month }} request{{ tier.requests_per_month > 1 ? 's' : '' }}/month
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Benefits -->
-                        <div class="space-y-3">
-                            <h3 class="font-medium">Benefits include:</h3>
-                            <ul class="space-y-2 text-muted-foreground">
-                                <li class="flex items-center gap-2">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    Request YouTube videos for reactions
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    Videos watched in chronological order (FIFO)
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    Track your request status
-                                </li>
-                                <li class="flex items-center gap-2">
-                                    <span class="h-1.5 w-1.5 rounded-full bg-primary" />
-                                    View the public video queue
-                                </li>
-                            </ul>
-                        </div>
-
-                        <!-- CTA -->
-                        <div class="flex flex-col gap-3 pt-4">
+                    <CardContent>
+                        <div class="flex flex-col gap-3">
                             <Button
                                 as="a"
-                                href="https://www.patreon.com"
+                                :href="subscribeUrl"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 size="lg"

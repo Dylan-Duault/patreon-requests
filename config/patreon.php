@@ -4,6 +4,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Patreon Subscribe URL
+    |--------------------------------------------------------------------------
+    |
+    | The URL to your Patreon page where users can subscribe.
+    | Example: https://www.patreon.com/c/yourcreatorname
+    |
+    */
+
+    'subscribe_url' => env('PATREON_SUBSCRIBE_URL', 'https://www.patreon.com'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Patreon Campaign ID
     |--------------------------------------------------------------------------
     |
