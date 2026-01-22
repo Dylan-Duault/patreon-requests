@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureActivePatron;
 use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureCreditsGranted;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use Illuminate\Foundation\Application;
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            EnsureCreditsGranted::class,
         ]);
 
         $middleware->alias([

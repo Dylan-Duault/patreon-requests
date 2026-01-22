@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
@@ -72,6 +73,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Get the credit transactions for the user.
+     */
+    public function creditTransactions(): HasMany
+    {
+        return $this->hasMany(CreditTransaction::class);
+    }
+
+    /**
      * Check if the user is an active patron.
      */
     public function isActivePatron(): bool
@@ -104,29 +113,97 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the number of remaining requests for this month.
+     * Get the user's current credit balance.
+     */
+    public function getCreditBalance(): int
+    {
+        return (int) $this->creditTransactions()->sum('amount');
+    }
+
+    /**
+     * Get the number of remaining requests (alias for credit balance).
      */
     public function getRemainingRequests(): int
     {
-        $limit = $this->getMonthlyRequestLimit();
+        return $this->getCreditBalance();
+    }
 
-        if ($limit === 0) {
-            return 0;
+    /**
+     * Check if the user has received their monthly credits for the current month.
+     */
+    public function hasReceivedMonthlyCredits(): bool
+    {
+        return $this->creditTransactions()
+            ->ofType(CreditTransaction::TYPE_MONTHLY_GRANT)
+            ->forCurrentMonth()
+            ->exists();
+    }
+
+    /**
+     * Grant monthly credits to the user.
+     */
+    public function grantMonthlyCredits(): ?CreditTransaction
+    {
+        if (! $this->isActivePatron()) {
+            return null;
         }
 
-        $usedThisMonth = $this->requests()
-            ->whereMonth('requested_at', now()->month)
-            ->whereYear('requested_at', now()->year)
-            ->sum('request_cost');
+        if ($this->hasReceivedMonthlyCredits()) {
+            return null;
+        }
 
-        return max(0, $limit - (int) $usedThisMonth);
+        $credits = $this->getMonthlyRequestLimit();
+
+        if ($credits <= 0) {
+            return null;
+        }
+
+        $transaction = $this->creditTransactions()->create([
+            'amount' => $credits,
+            'type' => CreditTransaction::TYPE_MONTHLY_GRANT,
+            'description' => 'Monthly credit grant for ' . now()->format('F Y'),
+        ]);
+
+        // Clear the cache
+        $this->clearMonthlyCreditCache();
+
+        return $transaction;
+    }
+
+    /**
+     * Debit credits for a video request.
+     */
+    public function debitCreditsForRequest(VideoRequest $request): CreditTransaction
+    {
+        return $this->creditTransactions()->create([
+            'amount' => -$request->request_cost,
+            'type' => CreditTransaction::TYPE_REQUEST,
+            'description' => 'Video request: ' . ($request->title ?? $request->youtube_video_id),
+            'video_request_id' => $request->id,
+        ]);
     }
 
     /**
      * Check if the user can make a new request.
      */
-    public function canMakeRequest(): bool
+    public function canMakeRequest(int $cost = 1): bool
     {
-        return $this->isActivePatron() && $this->getRemainingRequests() > 0;
+        return $this->isActivePatron() && $this->getCreditBalance() >= $cost;
+    }
+
+    /**
+     * Get the cache key for monthly credits check.
+     */
+    public function getMonthlyCreditCacheKey(): string
+    {
+        return "user:{$this->id}:monthly_credits:" . now()->format('Y-m');
+    }
+
+    /**
+     * Clear the monthly credit cache.
+     */
+    public function clearMonthlyCreditCache(): void
+    {
+        Cache::forget($this->getMonthlyCreditCacheKey());
     }
 }

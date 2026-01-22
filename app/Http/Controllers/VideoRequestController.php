@@ -7,6 +7,7 @@ use App\Services\YouTubeService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -104,12 +105,6 @@ class VideoRequestController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->canMakeRequest()) {
-            return back()->withErrors([
-                'youtube_url' => 'You have reached your monthly request limit.',
-            ]);
-        }
-
         $validated = $request->validate([
             'youtube_url' => ['required', 'url', function ($attribute, $value, $fail) {
                 if (! $this->youtubeService->isValidUrl($value)) {
@@ -140,28 +135,42 @@ class VideoRequestController extends Controller
 
         // Calculate request cost based on video duration
         $requestCost = $videoDetails['request_cost'] ?? 1;
-        $remainingRequests = $user->getRemainingRequests();
 
-        if ($requestCost > $remainingRequests) {
-            $maxMinutes = config('services.youtube.max_duration_minutes', 20);
+        // Use transaction with locking for atomic credit deduction
+        try {
+            DB::transaction(function () use ($user, $normalizedUrl, $videoId, $videoDetails, $requestCost, $validated) {
+                // Lock the user's credit transactions to prevent race conditions
+                $creditBalance = $user->creditTransactions()->lockForUpdate()->sum('amount');
 
+                if (! $user->isActivePatron() || $creditBalance < $requestCost) {
+                    $maxMinutes = config('services.youtube.max_duration_minutes', 20);
+                    throw new \Exception(
+                        "This video requires {$requestCost} " . ($requestCost === 1 ? 'credit' : 'credits') .
+                        " (videos over {$maxMinutes} minutes count as multiple credits). You only have {$creditBalance} remaining."
+                    );
+                }
+
+                $videoRequest = VideoRequest::create([
+                    'user_id' => $user->id,
+                    'youtube_url' => $normalizedUrl,
+                    'youtube_video_id' => $videoId,
+                    'title' => $videoDetails['title'] ?? null,
+                    'thumbnail' => $videoDetails['thumbnail'] ?? null,
+                    'duration_seconds' => $videoDetails['duration_seconds'] ?? null,
+                    'request_cost' => $requestCost,
+                    'context' => $validated['context'] ?? null,
+                    'status' => 'pending',
+                    'requested_at' => now(),
+                ]);
+
+                // Debit credits atomically
+                $user->debitCreditsForRequest($videoRequest);
+            });
+        } catch (\Exception $e) {
             return back()->withErrors([
-                'youtube_url' => "This video requires {$requestCost} " . ($requestCost === 1 ? 'request' : 'requests') . " (videos over {$maxMinutes} minutes count as multiple requests). You only have {$remainingRequests} remaining.",
+                'youtube_url' => $e->getMessage(),
             ]);
         }
-
-        VideoRequest::create([
-            'user_id' => $user->id,
-            'youtube_url' => $normalizedUrl,
-            'youtube_video_id' => $videoId,
-            'title' => $videoDetails['title'] ?? null,
-            'thumbnail' => $videoDetails['thumbnail'] ?? null,
-            'duration_seconds' => $videoDetails['duration_seconds'] ?? null,
-            'request_cost' => $requestCost,
-            'context' => $validated['context'] ?? null,
-            'status' => 'pending',
-            'requested_at' => now(),
-        ]);
 
         return redirect()->route('my-requests')
             ->with('success', 'Your video request has been submitted!');

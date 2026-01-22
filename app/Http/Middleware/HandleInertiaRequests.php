@@ -58,6 +58,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'patreonSubscribeUrl' => config('services.patreon.subscribe_url'),
+            'creditBalance' => $user ? $user->getCreditBalance() : 0,
         ];
     }
 }
