@@ -91,6 +91,104 @@ class YouTubeService
     }
 
     /**
+     * Get video duration in seconds from YouTube Data API.
+     */
+    public function getVideoDuration(string $videoId): ?int
+    {
+        $apiKey = config('services.youtube.api_key');
+
+        if (! $apiKey) {
+            Log::warning('YouTube API key not configured');
+
+            return null;
+        }
+
+        try {
+            $response = Http::get('https://www.googleapis.com/youtube/v3/videos', [
+                'part' => 'contentDetails',
+                'id' => $videoId,
+                'key' => $apiKey,
+            ]);
+
+            if (! $response->successful()) {
+                Log::warning('YouTube API request failed', [
+                    'video_id' => $videoId,
+                    'status' => $response->status(),
+                ]);
+
+                return null;
+            }
+
+            $data = $response->json();
+
+            if (empty($data['items'])) {
+                return null;
+            }
+
+            $duration = $data['items'][0]['contentDetails']['duration'] ?? null;
+
+            if (! $duration) {
+                return null;
+            }
+
+            return $this->parseDuration($duration);
+        } catch (\Exception $e) {
+            Log::warning('Failed to fetch YouTube video duration', [
+                'video_id' => $videoId,
+                'message' => $e->getMessage(),
+            ]);
+
+            return null;
+        }
+    }
+
+    /**
+     * Parse ISO 8601 duration to seconds.
+     */
+    protected function parseDuration(string $duration): int
+    {
+        $interval = new \DateInterval($duration);
+
+        return ($interval->h * 3600) + ($interval->i * 60) + $interval->s;
+    }
+
+    /**
+     * Calculate how many request credits a video costs based on duration.
+     */
+    public function calculateRequestCost(int $durationSeconds): int
+    {
+        $maxMinutes = config('services.youtube.max_duration_minutes', 20);
+        $maxSeconds = $maxMinutes * 60;
+
+        return (int) ceil($durationSeconds / $maxSeconds);
+    }
+
+    /**
+     * Get full video details including duration and request cost.
+     */
+    public function getVideoDetails(string $videoId): ?array
+    {
+        $info = $this->getVideoInfo($videoId);
+        $duration = $this->getVideoDuration($videoId);
+
+        if (! $info) {
+            return null;
+        }
+
+        $requestCost = $duration ? $this->calculateRequestCost($duration) : 1;
+
+        return [
+            'video_id' => $videoId,
+            'title' => $info['title'],
+            'thumbnail' => $info['thumbnail'],
+            'author' => $info['author'],
+            'duration_seconds' => $duration,
+            'request_cost' => $requestCost,
+            'max_duration_minutes' => config('services.youtube.max_duration_minutes', 20),
+        ];
+    }
+
+    /**
      * Normalize a YouTube URL to standard format.
      */
     public function normalizeUrl(string $url): ?string

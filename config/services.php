@@ -39,6 +39,12 @@ return [
         'client_id' => env('PATREON_CLIENT_ID'),
         'client_secret' => env('PATREON_CLIENT_SECRET'),
         'redirect' => env('PATREON_REDIRECT_URI'),
+        'subscribe_url' => env('PATREON_SUBSCRIBE_URL'),
+    ],
+
+    'youtube' => [
+        'api_key' => env('YOUTUBE_API_KEY'),
+        'max_duration_minutes' => (int) env('YOUTUBE_MAX_DURATION_MINUTES', 20),
     ],
 
 ];

@@ -22,6 +22,8 @@ class VideoRequest extends Model
         'youtube_video_id',
         'title',
         'thumbnail',
+        'duration_seconds',
+        'request_cost',
         'context',
         'status',
         'requested_at',

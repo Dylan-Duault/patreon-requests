@@ -38,6 +38,7 @@ Route::middleware('auth')->group(function () {
     Route::middleware('patron')->group(function () {
         Route::get('/requests', [VideoRequestController::class, 'index'])->name('requests.index');
         Route::get('/requests/new', [VideoRequestController::class, 'create'])->name('requests.create');
+        Route::post('/requests/check', [VideoRequestController::class, 'checkVideo'])->name('requests.check');
         Route::post('/requests', [VideoRequestController::class, 'store'])->name('requests.store');
         Route::get('/my-requests', [VideoRequestController::class, 'myRequests'])->name('my-requests');
     });

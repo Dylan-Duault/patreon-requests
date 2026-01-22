@@ -117,9 +117,9 @@ class User extends Authenticatable
         $usedThisMonth = $this->requests()
             ->whereMonth('requested_at', now()->month)
             ->whereYear('requested_at', now()->year)
-            ->count();
+            ->sum('request_cost');
 
-        return max(0, $limit - $usedThisMonth);
+        return max(0, $limit - (int) $usedThisMonth);
     }
 
     /**

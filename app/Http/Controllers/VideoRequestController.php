@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\VideoRequest;
 use App\Services\YouTubeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -53,7 +54,47 @@ class VideoRequestController extends Controller
         return Inertia::render('NewRequest', [
             'remainingRequests' => $user->getRemainingRequests(),
             'monthlyLimit' => $user->getMonthlyRequestLimit(),
+            'maxDurationMinutes' => config('services.youtube.max_duration_minutes', 20),
         ]);
+    }
+
+    /**
+     * Check video details including duration and request cost.
+     */
+    public function checkVideo(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'youtube_url' => ['required', 'url'],
+        ]);
+
+        if (! $this->youtubeService->isValidUrl($validated['youtube_url'])) {
+            return response()->json([
+                'error' => 'Invalid YouTube URL',
+            ], 422);
+        }
+
+        $videoId = $this->youtubeService->extractVideoId($validated['youtube_url']);
+
+        // Check for existing requests
+        $existingRequest = VideoRequest::where('youtube_video_id', $videoId)->first();
+
+        if ($existingRequest) {
+            return response()->json([
+                'error' => $existingRequest->isPending()
+                    ? 'This video is already in the queue.'
+                    : 'This video has already been requested.',
+            ], 422);
+        }
+
+        $details = $this->youtubeService->getVideoDetails($videoId);
+
+        if (! $details) {
+            return response()->json([
+                'error' => 'Could not fetch video details',
+            ], 422);
+        }
+
+        return response()->json($details);
     }
 
     /**
@@ -79,7 +120,7 @@ class VideoRequestController extends Controller
         ]);
 
         $videoId = $this->youtubeService->extractVideoId($validated['youtube_url']);
-        $videoInfo = $this->youtubeService->getVideoInfo($videoId);
+        $videoDetails = $this->youtubeService->getVideoDetails($videoId);
         $normalizedUrl = $this->youtubeService->normalizeUrl($validated['youtube_url']);
 
         // Check for existing requests
@@ -97,12 +138,26 @@ class VideoRequestController extends Controller
             ]);
         }
 
+        // Calculate request cost based on video duration
+        $requestCost = $videoDetails['request_cost'] ?? 1;
+        $remainingRequests = $user->getRemainingRequests();
+
+        if ($requestCost > $remainingRequests) {
+            $maxMinutes = config('services.youtube.max_duration_minutes', 20);
+
+            return back()->withErrors([
+                'youtube_url' => "This video requires {$requestCost} " . ($requestCost === 1 ? 'request' : 'requests') . " (videos over {$maxMinutes} minutes count as multiple requests). You only have {$remainingRequests} remaining.",
+            ]);
+        }
+
         VideoRequest::create([
             'user_id' => $user->id,
             'youtube_url' => $normalizedUrl,
             'youtube_video_id' => $videoId,
-            'title' => $videoInfo['title'] ?? null,
-            'thumbnail' => $videoInfo['thumbnail'] ?? null,
+            'title' => $videoDetails['title'] ?? null,
+            'thumbnail' => $videoDetails['thumbnail'] ?? null,
+            'duration_seconds' => $videoDetails['duration_seconds'] ?? null,
+            'request_cost' => $requestCost,
             'context' => $validated['context'] ?? null,
             'status' => 'pending',
             'requested_at' => now(),
