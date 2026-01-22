@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\VideoRequestController as AdminVideoRequestController;
 use App\Http\Controllers\Auth\PatreonController;
 use App\Http\Controllers\Auth\PatreonWebhookController;
@@ -48,6 +49,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/requests', [AdminVideoRequestController::class, 'index'])->name('requests.index');
         Route::patch('/requests/{request}/done', [AdminVideoRequestController::class, 'markDone'])->name('requests.done');
         Route::patch('/requests/{request}/pending', [AdminVideoRequestController::class, 'markPending'])->name('requests.pending');
+
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::post('/users/{user}/credits', [AdminUserController::class, 'adjustCredits'])->name('users.credits');
     });
 });
 
