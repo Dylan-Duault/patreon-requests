@@ -57,6 +57,7 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
             ],
+            'patreonSubscribeUrl' => config('services.patreon.subscribe_url'),
         ];
     }
 }
