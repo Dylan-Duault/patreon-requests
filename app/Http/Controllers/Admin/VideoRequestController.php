@@ -34,6 +34,8 @@ class VideoRequestController extends Controller
             'youtube_url' => $req->youtube_url,
             'youtube_video_id' => $req->youtube_video_id,
             'context' => $req->context,
+            'duration_seconds' => $req->duration_seconds,
+            'request_cost' => $req->request_cost,
             'status' => $req->status,
             'requested_at' => $req->requested_at->toISOString(),
             'completed_at' => $req->completed_at?->toISOString(),

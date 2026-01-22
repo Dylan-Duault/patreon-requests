@@ -3,6 +3,7 @@ import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import {
     CheckCircle,
     Clock,
+    Coins,
     ExternalLink,
     ListVideo,
     RotateCcw,
@@ -29,6 +30,8 @@ interface VideoRequest {
     youtube_url: string;
     youtube_video_id: string;
     context: string | null;
+    duration_seconds: number | null;
+    request_cost: number;
     status: 'pending' | 'done';
     requested_at: string;
     completed_at: string | null;
@@ -82,6 +85,17 @@ const formatDate = (dateString: string) => {
 
 const formatTier = (cents: number) => {
     return `$${(cents / 100).toFixed(2)}`;
+};
+
+const formatDuration = (seconds: number): string => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60;
+
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
 };
 
 const getInitials = (name: string) => {
@@ -238,9 +252,17 @@ const filterUrl = (status: string) => {
                                         >
                                             {{ request.title || 'Untitled Video' }}
                                         </a>
-                                        <p class="text-sm text-muted-foreground">
-                                            Requested {{ formatDate(request.requested_at) }}
-                                        </p>
+                                        <div class="flex items-center gap-3 text-sm text-muted-foreground">
+                                            <span>Requested {{ formatDate(request.requested_at) }}</span>
+                                            <span v-if="request.duration_seconds" class="flex items-center gap-1">
+                                                <Clock class="h-3 w-3" />
+                                                {{ formatDuration(request.duration_seconds) }}
+                                            </span>
+                                            <span class="flex items-center gap-1">
+                                                <Coins class="h-3 w-3" />
+                                                {{ request.request_cost }} {{ request.request_cost === 1 ? 'credit' : 'credits' }}
+                                            </span>
+                                        </div>
                                     </div>
                                     <Badge
                                         :variant="request.status === 'done' ? 'default' : 'secondary'"
