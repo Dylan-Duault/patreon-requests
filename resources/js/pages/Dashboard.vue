@@ -104,7 +104,7 @@ const formatTier = (cents: number) => {
                 <Card>
                     <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle class="text-sm font-medium">
-                            Monthly Limit
+                            Credits Per Month
                         </CardTitle>
                         <Video class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
@@ -113,7 +113,7 @@ const formatTier = (cents: number) => {
                             {{ monthlyLimit }}
                         </div>
                         <p class="text-xs text-muted-foreground mt-1">
-                            requests per month
+                            credits per renewal
                         </p>
                     </CardContent>
                 </Card>
@@ -121,7 +121,7 @@ const formatTier = (cents: number) => {
                 <Card>
                     <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle class="text-sm font-medium">
-                            Remaining This Month
+                            Credits Remaining
                         </CardTitle>
                         <Film class="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
@@ -130,7 +130,7 @@ const formatTier = (cents: number) => {
                             {{ remainingRequests }}
                         </div>
                         <p class="text-xs text-muted-foreground mt-1">
-                            requests available
+                            credits available
                         </p>
                     </CardContent>
                 </Card>

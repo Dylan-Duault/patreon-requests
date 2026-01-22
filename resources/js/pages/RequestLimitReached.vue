@@ -44,9 +44,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30">
                             <AlertTriangle class="h-8 w-8 text-amber-600 dark:text-amber-400" />
                         </div>
-                        <CardTitle class="text-2xl">Monthly Limit Reached</CardTitle>
+                        <CardTitle class="text-2xl">No Credits Remaining</CardTitle>
                         <CardDescription class="text-base">
-                            You've used all your video requests for this month
+                            You've used all your available credits
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="space-y-6">
@@ -59,9 +59,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                         <div class="flex items-start gap-3 rounded-lg border p-4">
                             <Calendar class="h-5 w-5 text-muted-foreground mt-0.5" />
                             <div>
-                                <p class="font-medium">When does my limit reset?</p>
+                                <p class="font-medium">When do I get more credits?</p>
                                 <p class="text-sm text-muted-foreground">
-                                    Your request limit resets on the 1st of each month. Check back then to submit new video requests!
+                                    New credits are added each month on subscription renewal.
                                 </p>
                             </div>
                         </div>

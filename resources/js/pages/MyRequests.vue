@@ -63,7 +63,7 @@ const formatDate = (dateString: string) => {
                 <div>
                     <h1 class="text-2xl font-semibold tracking-tight">My Requests</h1>
                     <p class="text-muted-foreground">
-                        {{ remainingRequests }} of {{ monthlyLimit }} requests remaining this month
+                        {{ remainingRequests }} {{ remainingRequests === 1 ? 'credit' : 'credits' }} remaining
                     </p>
                 </div>
                 <Button as-child :disabled="remainingRequests === 0">

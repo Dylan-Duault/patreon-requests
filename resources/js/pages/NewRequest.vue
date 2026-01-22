@@ -145,7 +145,7 @@ const submit = () => {
                         <Alert class="mb-6">
                             <AlertCircle class="h-4 w-4" />
                             <AlertDescription>
-                                You have <strong>{{ remainingRequests }}</strong> {{ remainingRequests === 1 ? 'request' : 'requests' }} remaining this month.
+                                You have <strong>{{ remainingRequests }}</strong> {{ remainingRequests === 1 ? 'credit' : 'credits' }} remaining.
                             </AlertDescription>
                         </Alert>
 
@@ -208,8 +208,8 @@ const submit = () => {
                                                     class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                                     :class="videoInfo.request_cost > remainingRequests ? 'bg-destructive/10 text-destructive' : 'bg-amber-500/10 text-amber-600'"
                                                 >
-                                                    {{ videoInfo.request_cost }} requests
-                                                    <span class="ml-1 font-normal">(video > {{ maxDurationMinutes }} min)</span>
+                                                    Count as {{ videoInfo.request_cost }} requests
+                                                    <span class="ml-1 font-normal">(1 request per {{ maxDurationMinutes }} mins)</span>
                                                 </span>
                                             </div>
                                         </div>
@@ -263,7 +263,7 @@ const submit = () => {
                                 <li>- Videos already in the queue cannot be requested again</li>
                                 <li>- Videos over {{ maxDurationMinutes }} minutes count as multiple requests</li>
                                 <li>- Requests are processed in chronological order (FIFO)</li>
-                                <li>- Your monthly limit resets on the 1st of each month</li>
+                                <li>- New credits are added each month on subscription renewal</li>
                             </ul>
                         </div>
                     </CardContent>
