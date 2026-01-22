@@ -91,7 +91,7 @@ const footerNavItems: NavItem[] = [];
 
             <!-- Patron Navigation -->
             <SidebarGroup v-if="patronNavItems.length > 0" class="px-2 py-0">
-                <SidebarGroupLabel>Video Requests</SidebarGroupLabel>
+                <SidebarGroupLabel>The world with D</SidebarGroupLabel>
                 <SidebarMenu>
                     <SidebarMenuItem v-for="item in patronNavItems" :key="item.title">
                         <SidebarMenuButton

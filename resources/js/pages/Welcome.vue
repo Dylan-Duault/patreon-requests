@@ -1,11 +1,68 @@
 <script setup lang="ts">
 import { Head, Link, usePage } from '@inertiajs/vue3';
-import { ListVideo, Sparkles, Video } from 'lucide-vue-next';
+import { onMounted, onUnmounted, ref } from 'vue';
 
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { Button } from '@/components/ui/button';
 
 const page = usePage();
+
+const animationImages = [
+    '/images/animations/Screenshot_20260122_195048-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_195145-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_195227-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_195250-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_195303-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_195327-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_200706-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_200756-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_200823-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_200954-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_201005-removebg-preview.png',
+    '/images/animations/Screenshot_20260122_201045-removebg-preview.png',
+];
+
+interface Flake {
+    id: number;
+    src: string;
+    left: number;
+    animationDuration: number;
+    delay: number;
+    size: number;
+}
+
+const flakes = ref<Flake[]>([]);
+let flakeId = 0;
+let spawnInterval: ReturnType<typeof setInterval> | null = null;
+
+function createFlake() {
+    const flake: Flake = {
+        id: flakeId++,
+        src: animationImages[Math.floor(Math.random() * animationImages.length)],
+        left: Math.random() * 100,
+        animationDuration: 8 + Math.random() * 6,
+        delay: 0,
+        size: 40 + Math.random() * 40,
+    };
+    flakes.value.push(flake);
+
+    setTimeout(() => {
+        flakes.value = flakes.value.filter((f) => f.id !== flake.id);
+    }, flake.animationDuration * 1000);
+}
+
+onMounted(() => {
+    for (let i = 0; i < 6; i++) {
+        setTimeout(() => createFlake(), i * 800);
+    }
+    spawnInterval = setInterval(createFlake, 2000);
+});
+
+onUnmounted(() => {
+    if (spawnInterval) {
+        clearInterval(spawnInterval);
+    }
+});
 </script>
 
 <template>
@@ -14,9 +71,25 @@ const page = usePage();
         <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
     </Head>
     <div
-        class="flex min-h-screen flex-col items-center bg-background p-6 lg:justify-center lg:p-8"
+        class="relative flex min-h-screen flex-col items-center overflow-hidden bg-background p-6 lg:justify-center lg:p-8"
     >
-        <header class="mb-6 w-full max-w-4xl">
+        <!-- Falling animations -->
+        <div class="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+            <img
+                v-for="flake in flakes"
+                :key="flake.id"
+                :src="flake.src"
+                class="falling-flake absolute"
+                :style="{
+                    left: `${flake.left}%`,
+                    width: `${flake.size}px`,
+                    height: `${flake.size}px`,
+                    animationDuration: `${flake.animationDuration}s`,
+                }"
+            />
+        </div>
+
+        <header class="relative z-10 mb-6 w-full max-w-4xl">
             <nav class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <AppLogoIcon
@@ -44,17 +117,13 @@ const page = usePage();
             </nav>
         </header>
 
-        <main class="flex w-full max-w-4xl flex-1 flex-col items-center justify-center text-center">
+        <main class="relative z-10 flex w-full max-w-4xl flex-1 flex-col items-center justify-center text-center">
             <div class="mb-8">
-                <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
-                    <Video class="h-10 w-10 text-primary" />
-                </div>
-                <h1 class="mb-4 text-4xl font-bold tracking-tight sm:text-5xl">
-                    Request Videos for Reactions
+                <h1 class="mb-6 text-4xl font-bold tracking-tight sm:text-5xl">
+                    Ask D for video reactions
                 </h1>
                 <p class="mx-auto max-w-2xl text-lg text-muted-foreground">
-                    Patreon subscribers can request YouTube videos for me to react to.
-                    Videos are watched in the order they're requested.
+                    Plus c'est con, plus c'est bon.
                 </p>
             </div>
 
@@ -77,41 +146,45 @@ const page = usePage();
                     Login with Patreon
                 </Button>
             </div>
-
-            <!-- Features -->
-            <div class="mt-16 grid gap-8 sm:grid-cols-3">
-                <div class="text-center">
-                    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-                        <Sparkles class="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <h3 class="mb-2 font-semibold">Tier-Based Limits</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Higher tiers get more monthly requests
-                    </p>
-                </div>
-                <div class="text-center">
-                    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-                        <ListVideo class="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <h3 class="mb-2 font-semibold">Fair Queue System</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Videos watched in chronological order (FIFO)
-                    </p>
-                </div>
-                <div class="text-center">
-                    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-muted">
-                        <Video class="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <h3 class="mb-2 font-semibold">Track Progress</h3>
-                    <p class="text-sm text-muted-foreground">
-                        See your request status in real-time
-                    </p>
-                </div>
-            </div>
         </main>
 
-        <footer class="mt-12 text-center text-sm text-muted-foreground">
-            <p>Subscribe on Patreon to start requesting videos</p>
+        <footer class="relative z-10 mt-12 text-center text-sm text-muted-foreground">
+            <a :href="page.props.patreonSubscribeUrl" target="_blank">Subscribe on Patreon to start requesting videos</a>
         </footer>
     </div>
 </template>
+
+<style scoped>
+.falling-flake {
+    top: -100px;
+    animation: fall linear forwards, spin linear infinite;
+    animation-duration: inherit, 3s;
+    object-fit: contain;
+}
+
+@keyframes fall {
+    0% {
+        top: -100px;
+        opacity: 0;
+    }
+    5% {
+        opacity: 0.7;
+    }
+    90% {
+        opacity: 0.7;
+    }
+    100% {
+        top: 110vh;
+        opacity: 0;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+</style>
