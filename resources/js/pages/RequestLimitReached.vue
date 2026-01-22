@@ -51,9 +51,9 @@ const breadcrumbs: BreadcrumbItem[] = [
                     </CardHeader>
                     <CardContent class="space-y-6">
                         <div class="rounded-lg bg-muted p-4 text-center">
-                            <p class="text-sm text-muted-foreground mb-1">Your monthly allowance</p>
-                            <p class="text-3xl font-bold">{{ monthlyLimit }} / {{ monthlyLimit }}</p>
-                            <p class="text-sm text-muted-foreground mt-1">requests used</p>
+                            <p class="text-sm text-muted-foreground mb-1">Credit balance</p>
+                            <p class="text-3xl font-bold">0</p>
+                            <p class="text-sm text-muted-foreground mt-1">credits remaining</p>
                         </div>
 
                         <div class="flex items-start gap-3 rounded-lg border p-4">
