@@ -209,7 +209,7 @@ const formatTier = (cents: number) => {
                     <div class="mt-4 pt-4 border-t">
                         <Button variant="ghost" as-child class="w-full">
                             <Link href="/my-requests">
-                                View All Requests
+                                View all my requests
                             </Link>
                         </Button>
                     </div>
