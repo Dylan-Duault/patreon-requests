@@ -42,6 +42,12 @@ RUN mkdir -p /home/$user/.composer && \
 # Configure nginx
 COPY docker/nginx.conf /etc/nginx/sites-available/default
 
+# Copy SSL certificates
+RUN mkdir -p /etc/nginx/ssl
+COPY docker/ssl/server.crt /etc/nginx/ssl/server.crt
+COPY docker/ssl/server.key /etc/nginx/ssl/server.key
+RUN chmod 600 /etc/nginx/ssl/server.key
+
 # Configure supervisord
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
@@ -64,6 +70,6 @@ RUN chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
 USER root
 
-EXPOSE 80
+EXPOSE 80 443
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
