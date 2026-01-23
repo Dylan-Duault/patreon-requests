@@ -23,10 +23,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
     {
-        title: 'Video Queue',
-        href: '/requests',
-    },
-    {
         title: 'Request Limit Reached',
         href: '/requests/new',
     },

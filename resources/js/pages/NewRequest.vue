@@ -33,10 +33,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/dashboard',
     },
     {
-        title: 'Video Queue',
-        href: '/requests',
-    },
-    {
         title: 'New Request',
         href: '/requests/new',
     },
@@ -208,8 +204,8 @@ const submit = () => {
                                                     class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                                     :class="videoInfo.request_cost > remainingRequests ? 'bg-destructive/10 text-destructive' : 'bg-amber-500/10 text-amber-600'"
                                                 >
-                                                    Count as {{ videoInfo.request_cost }} requests
-                                                    <span class="ml-1 font-normal">(1 request per {{ maxDurationMinutes }} mins)</span>
+                                                    Count as {{ videoInfo.request_cost }} credits
+                                                    <span class="ml-1 font-normal">(1 credit per {{ maxDurationMinutes }} mins)</span>
                                                 </span>
                                             </div>
                                         </div>
@@ -218,7 +214,9 @@ const submit = () => {
                                         v-if="videoInfo.request_cost > remainingRequests"
                                         class="mt-2 text-xs text-destructive"
                                     >
-                                        You don't have enough requests remaining. This video requires {{ videoInfo.request_cost }} {{ videoInfo.request_cost === 1 ? 'request' : 'requests' }}.
+                                        You don't have enough requests remaining.
+                                        <br />
+                                        This video requires {{ videoInfo.request_cost }} {{ videoInfo.request_cost === 1 ? 'credit' : 'credits' }}.
                                     </p>
                                 </div>
                             </div>
@@ -262,7 +260,7 @@ const submit = () => {
                                 <li>- Only YouTube videos are accepted</li>
                                 <li>- Videos already in the queue cannot be requested again</li>
                                 <li>- Videos over {{ maxDurationMinutes }} minutes count as multiple requests</li>
-                                <li>- Requests are processed in chronological order (FIFO)</li>
+                                <li>- Requests are processed in chronological order</li>
                                 <li>- New credits are added each month on subscription renewal</li>
                             </ul>
                         </div>
