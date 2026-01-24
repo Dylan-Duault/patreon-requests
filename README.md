@@ -1,14 +1,15 @@
 # Patreon Video Request Platform
 
-A platform for Patreon subscribers to request YouTube videos for your reaction channel. Request limits are based on Patreon tier.
+A platform for Patreon subscribers to request YouTube videos for your reaction channel. Credits accumulate based on Patreon tier, and video requests cost credits based on duration.
 
 ## Features
 
 - **Patreon OAuth Authentication** - Login exclusively via Patreon
-- **Tier-Based Limits** - Request limits based on subscription tier
+- **Credit-Based System** - Credits accumulate monthly based on subscription tier
+- **Duration-Based Costs** - Longer videos cost more credits (1 credit per 20 minutes)
 - **Video Queue** - FIFO queue system for fair video ordering
 - **Admin Panel** - Manage requests and mark videos as completed
-- **Real-time Status** - Track your request status
+- **Real-time Status** - Track your request and credit status
 
 ## Requirements
 
@@ -64,11 +65,13 @@ Configure your Patreon tiers in `config/patreon.php`:
 
 ```php
 'tiers' => [
-    // amount_in_cents => requests_per_month
-    500 => 1,   // $5 tier gets 1 request/month
-    1000 => 2,  // $10 tier gets 2 requests/month
+    // amount_in_cents => credits_per_month
+    500 => 1,   // $5 tier earns 1 credit/month
+    1000 => 2,  // $10 tier earns 2 credits/month
 ],
 ```
+
+Credits accumulate over time as long as the user remains subscribed. They are not reset monthly.
 
 ## Patreon Setup
 
@@ -81,6 +84,7 @@ See [docs/patreon-setup.md](docs/patreon-setup.md) for detailed Patreon configur
 | `php artisan user:make-admin {email}` | Grant admin privileges to a user |
 | `php artisan user:revoke-admin {email}` | Remove admin privileges |
 | `php artisan patreon:refresh-memberships` | Sync all users' Patreon membership status |
+| `php artisan credits:grant-monthly` | Grant monthly credits to active patrons |
 
 ## Routes
 
@@ -115,6 +119,7 @@ Add to your server's crontab:
 
 The following tasks run automatically:
 - **Daily:** Refresh Patreon memberships for all users
+- **Monthly (1st):** Grant monthly credits to active patrons
 
 ## Development
 
@@ -151,12 +156,16 @@ resources/js/
 ## Business Rules
 
 - **Authentication:** Patreon OAuth only
-- **Tier 1 ($5):** 1 request per month
-- **Tier 2 ($10):** 2 requests per month
+- **Credit System:** Credits accumulate monthly based on tier (not reset)
+  - Tier 1 ($5): Earns 1 credit/month
+  - Tier 2 ($10): Earns 2 credits/month
+- **Request Costs:** Based on video duration (1 credit per 20 minutes)
+  - 0-20 min = 1 credit
+  - 21-40 min = 2 credits
+  - 41-60 min = 3 credits, etc.
 - **Non-subscribers:** Can login but see "subscribe to request" page
 - **Requests:** YouTube links only, pending/done status
 - **Queue:** Videos watched in chronological order (FIFO)
-- **Monthly Reset:** Request limits reset on the 1st of each month
 
 ## License
 

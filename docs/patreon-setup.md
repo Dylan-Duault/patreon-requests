@@ -127,6 +127,17 @@ You should see:
 - `patron_status` - `active_patron`, `former_patron`, or `null`
 - `patron_tier_cents` - Pledge amount in cents
 
+### Verify Credit System
+
+Check that credits are being granted:
+
+```bash
+php artisan tinker
+>>> $user = User::latest()->first()
+>>> $user->getCreditBalance()  // Total accumulated credits
+>>> $user->creditTransactions()->get()  // Credit history
+```
+
 ## 7. Production Checklist
 
 - [ ] Update `PATREON_REDIRECT_URI` to production URL
@@ -147,6 +158,12 @@ Ensure the redirect URI in your `.env` exactly matches one registered in your Pa
 1. Check that your Campaign ID is correct
 2. Verify the user is actually a patron of your campaign
 3. Run `php artisan patreon:refresh-memberships --user=USER_ID` to manually refresh
+
+### Credits Not Appearing
+
+1. Credits are granted monthly - check if user has received this month's grant
+2. Run `php artisan credits:grant-monthly --user=USER_ID` to manually grant
+3. Verify user has `patron_status = 'active_patron'` and `patron_tier_cents > 0`
 
 ### Webhook Not Working
 

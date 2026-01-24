@@ -45,7 +45,7 @@ All routes below require authentication via the `auth` middleware.
 ```
 GET /dashboard
 ```
-User dashboard showing patron status and recent requests.
+User dashboard showing patron status, credit balance, and recent requests.
 
 **Response props:**
 ```typescript
@@ -53,8 +53,8 @@ User dashboard showing patron status and recent requests.
   isActivePatron: boolean;
   patronStatus: string | null;
   tierCents: number;
-  monthlyLimit: number;
-  remainingRequests: number;
+  monthlyCredits: number;      // Credits earned per month
+  creditBalance: number;       // Total accumulated credits
   recentRequests: VideoRequest[];
 }
 ```
@@ -71,7 +71,7 @@ Shown to non-patrons. Displays subscription options.
 {
   tiers: Array<{
     amount: string;
-    requests_per_month: number;
+    credits_per_month: number;
   }>;
 }
 ```
@@ -103,6 +103,8 @@ View the pending video queue (chronological order).
     thumbnail: string | null;
     youtube_url: string;
     youtube_video_id: string;
+    duration_seconds: number | null;
+    request_cost: number;        // Credits this request cost
     requested_at: string;
     user: {
       name: string;
@@ -122,8 +124,8 @@ Form to submit a new video request.
 **Response props:**
 ```typescript
 {
-  remainingRequests: number;
-  monthlyLimit: number;
+  creditBalance: number;       // User's available credits
+  monthlyCredits: number;      // Credits earned per month
 }
 ```
 
@@ -143,11 +145,16 @@ Submit a new video request.
 
 **Validation:**
 - `youtube_url` - Required, valid YouTube URL
-- User must have remaining requests for the month
+- User must have sufficient credits for the video duration
 - Video must not already be in the pending queue
 
+**Credit Cost Calculation:**
+- Video duration is fetched from YouTube API
+- Cost = ceil(duration_minutes / 20)
+- Example: 45-minute video costs 3 credits
+
 **Success:** Redirects to `/my-requests` with success message
-**Error:** Returns validation errors
+**Error:** Returns validation errors (including insufficient credits)
 
 ### My Requests
 
@@ -165,12 +172,14 @@ View the user's own requests and their status.
     thumbnail: string | null;
     youtube_url: string;
     youtube_video_id: string;
+    duration_seconds: number | null;
+    request_cost: number;        // Credits this request cost
     status: 'pending' | 'done';
     requested_at: string;
     completed_at: string | null;
   }>;
-  remainingRequests: number;
-  monthlyLimit: number;
+  creditBalance: number;         // User's available credits
+  monthlyCredits: number;        // Credits earned per month
 }
 ```
 
@@ -199,6 +208,8 @@ View all video requests with filtering options.
     thumbnail: string | null;
     youtube_url: string;
     youtube_video_id: string;
+    duration_seconds: number | null;
+    request_cost: number;        // Credits this request cost
     status: 'pending' | 'done';
     requested_at: string;
     completed_at: string | null;
@@ -208,6 +219,7 @@ View all video requests with filtering options.
       email: string;
       avatar: string | null;
       tier_cents: number;
+      credit_balance: number;    // User's current credit balance
     };
   }>;
   stats: {
