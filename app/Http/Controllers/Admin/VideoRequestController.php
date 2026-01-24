@@ -16,7 +16,7 @@ class VideoRequestController extends Controller
      */
     public function index(Request $request): Response
     {
-        $status = $request->query('status', 'all');
+        $status = $request->query('status', 'pending');
 
         $query = VideoRequest::with('user:id,name,email,avatar,patron_tier_cents')
             ->chronological();

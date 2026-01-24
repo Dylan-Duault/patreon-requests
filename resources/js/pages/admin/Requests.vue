@@ -120,7 +120,7 @@ const markAsPending = (requestId: number) => {
 };
 
 const filterUrl = (status: string) => {
-    return status === 'all' ? '/admin/requests' : `/admin/requests?status=${status}`;
+    return status === 'pending' ? '/admin/requests' : `/admin/requests?status=${status}`;
 };
 </script>
 
@@ -157,6 +157,7 @@ const filterUrl = (status: string) => {
                         <div class="text-2xl font-bold">{{ stats.pending }}</div>
                     </CardContent>
                 </Card>
+                
                 <Card>
                     <CardHeader class="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle class="text-sm font-medium">Completed</CardTitle>
