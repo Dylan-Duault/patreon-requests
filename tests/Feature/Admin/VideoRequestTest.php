@@ -158,9 +158,22 @@ describe('listing video requests', function () {
     });
 
     test('requests include rating in response', function () {
-        VideoRequest::factory()->create(['rating' => 'up', 'status' => 'done']);
-        VideoRequest::factory()->create(['rating' => 'down', 'status' => 'done']);
-        VideoRequest::factory()->create(['rating' => null, 'status' => 'pending']);
+        // Create with explicit requested_at to control order (chronological)
+        VideoRequest::factory()->create([
+            'rating' => 'up',
+            'status' => 'done',
+            'requested_at' => now()->subDays(3),
+        ]);
+        VideoRequest::factory()->create([
+            'rating' => 'down',
+            'status' => 'done',
+            'requested_at' => now()->subDays(2),
+        ]);
+        VideoRequest::factory()->create([
+            'rating' => null,
+            'status' => 'pending',
+            'requested_at' => now()->subDay(),
+        ]);
 
         $this->actingAs($this->admin)
             ->get('/admin/requests?status=all')
