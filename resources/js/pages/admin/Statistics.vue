@@ -53,6 +53,7 @@ interface LeaderboardEntry {
         avatar: string | null;
     };
     request_count: number;
+    up_percentage: number | null;
 }
 
 const props = defineProps<{
@@ -63,6 +64,7 @@ const props = defineProps<{
     memberLeaderboard: LeaderboardEntry[];
     granularity: 'daily' | 'weekly' | 'monthly';
     dateRange: DateRangeProps;
+    isAllTime: boolean;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -80,6 +82,9 @@ const dateValue = ref({
 const popoverOpen = ref(false);
 
 const formattedDateRange = computed(() => {
+    if (props.isAllTime) {
+        return 'All time';
+    }
     const options: Intl.DateTimeFormatOptions = {
         month: 'short',
         day: 'numeric',
@@ -123,6 +128,17 @@ const setPreset = (days: number) => {
         {
             start_date: start.toISOString().split('T')[0],
             end_date: end.toISOString().split('T')[0],
+        },
+        { preserveState: true }
+    );
+};
+
+const setAllTime = () => {
+    router.get(
+        '/admin/statistics',
+        {
+            start_date: 'all',
+            end_date: new Date().toISOString().split('T')[0],
         },
         { preserveState: true }
     );
@@ -195,6 +211,7 @@ const getInitials = (name: string) => {
                         <Button variant="outline" size="sm" @click="setPreset(7)">7D</Button>
                         <Button variant="outline" size="sm" @click="setPreset(30)">30D</Button>
                         <Button variant="outline" size="sm" @click="setPreset(90)">90D</Button>
+                        <Button variant="outline" size="sm" @click="setAllTime">All</Button>
                     </div>
 
                     <!-- Date Range Picker -->
@@ -344,6 +361,14 @@ const getInitials = (name: string) => {
                                 <span class="flex-1 truncate text-sm font-medium">
                                     {{ entry.user.name }}
                                 </span>
+                                <span
+                                    v-if="entry.up_percentage !== null"
+                                    class="text-sm font-medium"
+                                    :class="entry.up_percentage >= 50 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                >
+                                    {{ entry.up_percentage }}%
+                                </span>
+                                <span v-else class="text-sm text-muted-foreground">-</span>
                                 <span class="text-sm text-muted-foreground">
                                     {{ entry.request_count }} request{{ entry.request_count !== 1 ? 's' : '' }}
                                 </span>

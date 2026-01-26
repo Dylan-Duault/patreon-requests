@@ -6,6 +6,7 @@ import {
     Minus,
     Plus,
     Search,
+    ThumbsUp,
     Users,
     XCircle,
 } from 'lucide-vue-next';
@@ -44,6 +45,9 @@ interface User {
     is_active_patron: boolean;
     monthly_limit: number;
     credit_balance: number;
+    request_count: number;
+    rated_count: number;
+    up_percentage: number | null;
 }
 
 defineProps<{
@@ -227,6 +231,26 @@ const submitAdjustment = () => {
                             <div class="text-center hidden sm:block">
                                 <p class="text-xs text-muted-foreground">Per Month</p>
                                 <p class="font-medium">{{ user.monthly_limit }}</p>
+                            </div>
+
+                            <!-- Request Count -->
+                            <div class="text-center hidden sm:block">
+                                <p class="text-xs text-muted-foreground">Requests</p>
+                                <p class="font-medium">{{ user.request_count }}</p>
+                            </div>
+
+                            <!-- Rating -->
+                            <div v-if="user.rated_count > 0" class="text-center hidden sm:block">
+                                <p class="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                                    <ThumbsUp class="h-3 w-3" />
+                                    Rating
+                                </p>
+                                <p
+                                    class="font-medium"
+                                    :class="user.up_percentage! >= 50 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                >
+                                    {{ user.up_percentage }}%
+                                </p>
                             </div>
 
                             <!-- Credit Balance -->

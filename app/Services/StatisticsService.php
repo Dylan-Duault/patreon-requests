@@ -72,7 +72,9 @@ class StatisticsService
                 'users.id',
                 'users.name',
                 'users.avatar',
-                DB::raw('COUNT(*) as request_count')
+                DB::raw('COUNT(*) as request_count'),
+                DB::raw("SUM(CASE WHEN video_requests.rating = 'up' THEN 1 ELSE 0 END) as up_count"),
+                DB::raw("SUM(CASE WHEN video_requests.rating IS NOT NULL THEN 1 ELSE 0 END) as rated_count")
             )
             ->groupBy('users.id', 'users.name', 'users.avatar')
             ->orderByDesc('request_count')
@@ -85,7 +87,10 @@ class StatisticsService
                 'name' => $item->name,
                 'avatar' => $item->avatar,
             ],
-            'request_count' => $item->request_count,
+            'request_count' => (int) $item->request_count,
+            'up_percentage' => $item->rated_count > 0
+                ? round($item->up_count * 100.0 / $item->rated_count, 1)
+                : null,
         ])->toArray();
     }
 

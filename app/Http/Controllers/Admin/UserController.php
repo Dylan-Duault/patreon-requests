@@ -21,6 +21,9 @@ class UserController extends Controller
 
         $query = User::query()
             ->withSum('creditTransactions', 'amount')
+            ->withCount('requests')
+            ->withCount(['requests as rated_count' => fn ($q) => $q->whereNotNull('rating')])
+            ->withCount(['requests as up_count' => fn ($q) => $q->where('rating', 'up')])
             ->orderBy('name');
 
         if ($search) {
@@ -40,6 +43,11 @@ class UserController extends Controller
             'is_active_patron' => $user->isActivePatron(),
             'monthly_limit' => $user->getMonthlyRequestLimit(),
             'credit_balance' => (int) ($user->credit_transactions_sum_amount ?? 0),
+            'request_count' => (int) $user->requests_count,
+            'rated_count' => (int) $user->rated_count,
+            'up_percentage' => $user->rated_count > 0
+                ? round($user->up_count * 100.0 / $user->rated_count, 1)
+                : null,
         ]);
 
         return Inertia::render('admin/Users', [

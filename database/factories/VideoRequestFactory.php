@@ -27,7 +27,8 @@ class VideoRequestFactory extends Factory
             'title' => fake()->sentence(4),
             'thumbnail' => "https://img.youtube.com/vi/{$videoId}/hqdefault.jpg",
             'status' => 'pending',
-            'requested_at' => fake()->dateTimeBetween('-1 month', 'now'),
+            'requested_at' => fake()->dateTimeBetween('-12 month', 'now'),
+            'duration_seconds' => random_int(300, 2000),
             'completed_at' => null,
         ];
     }
@@ -40,6 +41,7 @@ class VideoRequestFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'done',
             'completed_at' => fake()->dateTimeBetween($attributes['requested_at'], 'now'),
+            'rating' => random_int(1,4) > 1 ? 'up' : 'down'
         ]);
     }
 
