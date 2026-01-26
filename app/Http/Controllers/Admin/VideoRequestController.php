@@ -37,6 +37,7 @@ class VideoRequestController extends Controller
             'duration_seconds' => $req->duration_seconds,
             'request_cost' => $req->request_cost,
             'status' => $req->status,
+            'rating' => $req->rating,
             'requested_at' => $req->requested_at->toISOString(),
             'completed_at' => $req->completed_at?->toISOString(),
             'user' => [
@@ -62,16 +63,6 @@ class VideoRequestController extends Controller
     }
 
     /**
-     * Mark a video request as done.
-     */
-    public function markDone(VideoRequest $request): RedirectResponse
-    {
-        $request->markAsDone();
-
-        return back()->with('success', 'Video marked as done.');
-    }
-
-    /**
      * Mark a video request as pending (undo done).
      */
     public function markPending(VideoRequest $request): RedirectResponse
@@ -79,8 +70,25 @@ class VideoRequestController extends Controller
         $request->update([
             'status' => 'pending',
             'completed_at' => null,
+            'rating' => null,
         ]);
 
         return back()->with('success', 'Video marked as pending.');
+    }
+
+    /**
+     * Rate a video request (thumbs up/down) and mark as done.
+     */
+    public function rate(Request $httpRequest, VideoRequest $request): RedirectResponse
+    {
+        $validated = $httpRequest->validate([
+            'rating' => ['required', 'in:up,down'],
+        ]);
+
+        $request->rate($validated['rating']);
+
+        $ratingLabel = $validated['rating'] === 'up' ? 'thumbs up' : 'thumbs down';
+
+        return back()->with('success', "Video rated with {$ratingLabel} and marked as done.");
     }
 }

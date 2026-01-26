@@ -51,6 +51,27 @@ class VideoRequestFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'pending',
             'completed_at' => null,
+            'rating' => null,
+        ]);
+    }
+
+    /**
+     * Indicate that the request is rated thumbs up.
+     */
+    public function ratedUp(): static
+    {
+        return $this->completed()->state(fn (array $attributes) => [
+            'rating' => 'up',
+        ]);
+    }
+
+    /**
+     * Indicate that the request is rated thumbs down.
+     */
+    public function ratedDown(): static
+    {
+        return $this->completed()->state(fn (array $attributes) => [
+            'rating' => 'down',
         ]);
     }
 }

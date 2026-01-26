@@ -7,6 +7,8 @@ import {
     ExternalLink,
     ListVideo,
     RotateCcw,
+    ThumbsDown,
+    ThumbsUp,
     Video,
 } from 'lucide-vue-next';
 
@@ -33,6 +35,7 @@ interface VideoRequest {
     duration_seconds: number | null;
     request_cost: number;
     status: 'pending' | 'done';
+    rating: 'up' | 'down' | null;
     requested_at: string;
     completed_at: string | null;
     user: {
@@ -107,14 +110,14 @@ const getInitials = (name: string) => {
         .slice(0, 2);
 };
 
-const markAsDone = (requestId: number) => {
-    router.patch(`/admin/requests/${requestId}/done`, {}, {
+const markAsPending = (requestId: number) => {
+    router.patch(`/admin/requests/${requestId}/pending`, {}, {
         preserveScroll: true,
     });
 };
 
-const markAsPending = (requestId: number) => {
-    router.patch(`/admin/requests/${requestId}/pending`, {}, {
+const rateRequest = (requestId: number, rating: 'up' | 'down') => {
+    router.patch(`/admin/requests/${requestId}/rate`, { rating }, {
         preserveScroll: true,
     });
 };
@@ -301,24 +304,57 @@ const filterUrl = (status: string) => {
                                 </div>
 
                                 <!-- Actions -->
-                                <div class="flex gap-2 pt-2">
-                                    <Button
-                                        v-if="request.status === 'pending'"
-                                        size="sm"
-                                        @click="markAsDone(request.id)"
-                                    >
-                                        <CheckCircle class="mr-2 h-4 w-4" />
-                                        Mark Done
-                                    </Button>
-                                    <Button
-                                        v-else
-                                        variant="outline"
-                                        size="sm"
-                                        @click="markAsPending(request.id)"
-                                    >
-                                        <RotateCcw class="mr-2 h-4 w-4" />
-                                        Revert to Pending
-                                    </Button>
+                                <div class="flex items-center gap-2 pt-2">
+                                    <!-- Rating buttons for pending requests -->
+                                    <template v-if="request.status === 'pending'">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            class="text-green-600 hover:bg-green-50 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-950 dark:hover:text-green-300"
+                                            @click="rateRequest(request.id, 'up')"
+                                        >
+                                            <ThumbsUp class="mr-2 h-4 w-4" />
+                                            Good
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            class="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
+                                            @click="rateRequest(request.id, 'down')"
+                                        >
+                                            <ThumbsDown class="mr-2 h-4 w-4" />
+                                            Bad
+                                        </Button>
+                                    </template>
+                                    <!-- Show rating and revert for completed requests -->
+                                    <template v-else>
+                                        <div v-if="request.rating" class="flex items-center gap-1 text-sm">
+                                            <ThumbsUp
+                                                v-if="request.rating === 'up'"
+                                                class="h-4 w-4 text-green-600 dark:text-green-400"
+                                            />
+                                            <ThumbsDown
+                                                v-else
+                                                class="h-4 w-4 text-red-600 dark:text-red-400"
+                                            />
+                                            <span
+                                                :class="request.rating === 'up'
+                                                    ? 'text-green-600 dark:text-green-400'
+                                                    : 'text-red-600 dark:text-red-400'"
+                                            >
+                                                {{ request.rating === 'up' ? 'Good' : 'Bad' }}
+                                            </span>
+                                        </div>
+                                        <span v-else class="text-sm text-muted-foreground">No rating</span>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            @click="markAsPending(request.id)"
+                                        >
+                                            <RotateCcw class="mr-2 h-4 w-4" />
+                                            Revert to Pending
+                                        </Button>
+                                    </template>
                                     <Button
                                         variant="ghost"
                                         size="sm"

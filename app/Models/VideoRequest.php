@@ -26,6 +26,7 @@ class VideoRequest extends Model
         'request_cost',
         'context',
         'status',
+        'rating',
         'requested_at',
         'completed_at',
     ];
@@ -76,17 +77,6 @@ class VideoRequest extends Model
     }
 
     /**
-     * Mark the request as done.
-     */
-    public function markAsDone(): bool
-    {
-        return $this->update([
-            'status' => 'done',
-            'completed_at' => now(),
-        ]);
-    }
-
-    /**
      * Check if the request is pending.
      */
     public function isPending(): bool
@@ -100,5 +90,17 @@ class VideoRequest extends Model
     public function isDone(): bool
     {
         return $this->status === 'done';
+    }
+
+    /**
+     * Rate the request and mark as done.
+     */
+    public function rate(string $rating): bool
+    {
+        return $this->update([
+            'rating' => $rating,
+            'status' => 'done',
+            'completed_at' => $this->completed_at ?? now(),
+        ]);
     }
 }
