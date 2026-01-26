@@ -33,9 +33,12 @@
     },
     "dependencies": {
         "@inertiajs/vue3": "^2.3.7",
+        "@internationalized/date": "^3.10.1",
         "@vueuse/core": "^12.8.2",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
+        "highcharts": "^12.5.0",
+        "highcharts-vue": "^2.0.1",
         "laravel-vite-plugin": "^2.0.0",
         "lucide-vue-next": "^0.468.0",
         "reka-ui": "^2.6.1",

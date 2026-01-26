@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\StatisticsController as AdminStatisticsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\VideoRequestController as AdminVideoRequestController;
 use App\Http\Controllers\Auth\PatreonController;
@@ -47,11 +48,13 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/requests', [AdminVideoRequestController::class, 'index'])->name('requests.index');
-        Route::patch('/requests/{request}/done', [AdminVideoRequestController::class, 'markDone'])->name('requests.done');
         Route::patch('/requests/{request}/pending', [AdminVideoRequestController::class, 'markPending'])->name('requests.pending');
+        Route::patch('/requests/{request}/rate', [AdminVideoRequestController::class, 'rate'])->name('requests.rate');
 
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
         Route::post('/users/{user}/credits', [AdminUserController::class, 'adjustCredits'])->name('users.credits');
+
+        Route::get('/statistics', [AdminStatisticsController::class, 'index'])->name('statistics.index');
     });
 });
 

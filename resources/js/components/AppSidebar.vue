@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { LayoutGrid, ListVideo, Plus, Settings, Users, Video } from 'lucide-vue-next';
+import { BarChart3, LayoutGrid, ListVideo, Plus, Settings, Users, Video } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import NavFooter from '@/components/NavFooter.vue';
@@ -70,6 +70,11 @@ const adminNavItems = computed<NavItem[]>(() => {
             title: 'Manage Users',
             href: '/admin/users',
             icon: Users,
+        },
+        {
+            title: 'Statistics',
+            href: '/admin/statistics',
+            icon: BarChart3,
         },
     ];
 });
