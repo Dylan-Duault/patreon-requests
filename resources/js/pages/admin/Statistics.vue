@@ -199,27 +199,27 @@ const getInitials = (name: string) => {
             <!-- Header -->
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 class="text-2xl font-semibold tracking-tight">Statistics</h1>
-                    <p class="text-muted-foreground">
+                    <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">Statistics</h1>
+                    <p class="text-sm sm:text-base text-muted-foreground">
                         Request analytics and trends ({{ granularityLabel }} view)
                     </p>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 w-full sm:w-auto">
                     <!-- Quick Presets -->
                     <div class="flex gap-1">
-                        <Button variant="outline" size="sm" @click="setPreset(7)">7D</Button>
-                        <Button variant="outline" size="sm" @click="setPreset(30)">30D</Button>
-                        <Button variant="outline" size="sm" @click="setPreset(90)">90D</Button>
-                        <Button variant="outline" size="sm" @click="setAllTime">All</Button>
+                        <Button variant="outline" size="sm" @click="setPreset(7)" class="flex-1 sm:flex-none">7D</Button>
+                        <Button variant="outline" size="sm" @click="setPreset(30)" class="flex-1 sm:flex-none">30D</Button>
+                        <Button variant="outline" size="sm" @click="setPreset(90)" class="flex-1 sm:flex-none">90D</Button>
+                        <Button variant="outline" size="sm" @click="setAllTime" class="flex-1 sm:flex-none">All</Button>
                     </div>
 
                     <!-- Date Range Picker -->
                     <PopoverRoot v-model:open="popoverOpen">
                         <PopoverTrigger as-child>
-                            <Button variant="outline" class="gap-2">
+                            <Button variant="outline" class="gap-2 w-full sm:w-auto justify-center">
                                 <CalendarDays class="h-4 w-4" />
-                                {{ formattedDateRange }}
+                                <span class="truncate">{{ formattedDateRange }}</span>
                             </Button>
                         </PopoverTrigger>
                         <PopoverPortal>
@@ -341,10 +341,10 @@ const getInitials = (name: string) => {
                             <div
                                 v-for="(entry, index) in memberLeaderboard"
                                 :key="entry.user.id"
-                                class="flex items-center gap-3"
+                                class="flex items-center gap-2 sm:gap-3"
                             >
                                 <span
-                                    class="w-6 text-center text-sm font-medium"
+                                    class="w-5 sm:w-6 text-center text-xs sm:text-sm font-medium flex-shrink-0"
                                     :class="{
                                         'text-yellow-500': index === 0,
                                         'text-gray-400': index === 1,
@@ -354,23 +354,26 @@ const getInitials = (name: string) => {
                                 >
                                     {{ index + 1 }}
                                 </span>
-                                <Avatar class="h-8 w-8">
+                                <Avatar class="h-7 w-7 sm:h-8 sm:w-8 flex-shrink-0">
                                     <AvatarImage v-if="entry.user.avatar" :src="entry.user.avatar" :alt="entry.user.name" />
-                                    <AvatarFallback>{{ getInitials(entry.user.name) }}</AvatarFallback>
+                                    <AvatarFallback class="text-xs">{{ getInitials(entry.user.name) }}</AvatarFallback>
                                 </Avatar>
-                                <span class="flex-1 truncate text-sm font-medium">
+                                <span class="flex-1 truncate text-xs sm:text-sm font-medium min-w-0">
                                     {{ entry.user.name }}
                                 </span>
                                 <span
                                     v-if="entry.up_percentage !== null"
-                                    class="text-sm font-medium"
+                                    class="text-xs sm:text-sm font-medium whitespace-nowrap flex-shrink-0"
                                     :class="entry.up_percentage >= 50 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
                                 >
                                     {{ entry.up_percentage }}%
                                 </span>
-                                <span v-else class="text-sm text-muted-foreground">-</span>
-                                <span class="text-sm text-muted-foreground">
+                                <span v-else class="text-xs sm:text-sm text-muted-foreground flex-shrink-0">-</span>
+                                <span class="text-xs sm:text-sm text-muted-foreground whitespace-nowrap hidden sm:inline">
                                     {{ entry.request_count }} request{{ entry.request_count !== 1 ? 's' : '' }}
+                                </span>
+                                <span class="text-xs text-muted-foreground whitespace-nowrap sm:hidden flex-shrink-0">
+                                    {{ entry.request_count }}
                                 </span>
                             </div>
                         </div>

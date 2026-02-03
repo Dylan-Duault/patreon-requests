@@ -132,14 +132,14 @@ const submitAdjustment = () => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 class="text-2xl font-semibold tracking-tight">Manage Users</h1>
-                    <p class="text-muted-foreground">
+                    <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">Manage Users</h1>
+                    <p class="text-sm sm:text-base text-muted-foreground">
                         View users and manage their credits
                     </p>
                 </div>
-                <Button variant="outline" as-child>
+                <Button variant="outline" as-child class="w-full sm:w-auto">
                     <Link href="/admin/requests">
                         View Requests
                     </Link>
@@ -147,8 +147,8 @@ const submitAdjustment = () => {
             </div>
 
             <!-- Search -->
-            <div class="flex gap-2">
-                <div class="relative flex-1 max-w-sm">
+            <div class="flex flex-col sm:flex-row gap-2">
+                <div class="relative flex-1 sm:max-w-sm">
                     <Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <Input
                         v-model="searchQuery"
@@ -157,7 +157,7 @@ const submitAdjustment = () => {
                         @keyup.enter="handleSearch"
                     />
                 </div>
-                <Button @click="handleSearch">Search</Button>
+                <Button @click="handleSearch" class="w-full sm:w-auto">Search</Button>
             </div>
 
             <!-- Flash Messages -->
@@ -181,103 +181,126 @@ const submitAdjustment = () => {
                         <div
                             v-for="user in users"
                             :key="user.id"
-                            class="flex items-center gap-4 rounded-lg border p-4"
+                            class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4"
                         >
-                            <!-- Avatar -->
-                            <Avatar class="h-10 w-10">
-                                <AvatarImage
-                                    v-if="user.avatar"
-                                    :src="user.avatar"
-                                    :alt="user.name"
-                                />
-                                <AvatarFallback>
-                                    {{ getInitials(user.name) }}
-                                </AvatarFallback>
-                            </Avatar>
+                            <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                                <!-- Avatar -->
+                                <Avatar class="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0">
+                                    <AvatarImage
+                                        v-if="user.avatar"
+                                        :src="user.avatar"
+                                        :alt="user.name"
+                                    />
+                                    <AvatarFallback class="text-xs">
+                                        {{ getInitials(user.name) }}
+                                    </AvatarFallback>
+                                </Avatar>
 
-                            <!-- User Info -->
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-medium truncate">{{ user.name }}</span>
-                                    <Badge
-                                        v-if="user.is_active_patron"
-                                        variant="default"
-                                        class="flex items-center gap-1"
-                                    >
-                                        <CheckCircle class="h-3 w-3" />
-                                        Active
-                                    </Badge>
-                                    <Badge
-                                        v-else
-                                        variant="secondary"
-                                        class="flex items-center gap-1"
-                                    >
-                                        <XCircle class="h-3 w-3" />
-                                        Inactive
-                                    </Badge>
+                                <!-- User Info -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                        <span class="font-medium truncate text-sm sm:text-base">{{ user.name }}</span>
+                                        <Badge
+                                            v-if="user.is_active_patron"
+                                            variant="default"
+                                            class="flex items-center gap-1 text-xs"
+                                        >
+                                            <CheckCircle class="h-3 w-3" />
+                                            <span class="hidden sm:inline">Active</span>
+                                            <span class="sm:hidden">✓</span>
+                                        </Badge>
+                                        <Badge
+                                            v-else
+                                            variant="secondary"
+                                            class="flex items-center gap-1 text-xs"
+                                        >
+                                            <XCircle class="h-3 w-3" />
+                                            <span class="hidden sm:inline">Inactive</span>
+                                            <span class="sm:hidden">✗</span>
+                                        </Badge>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-muted-foreground truncate">{{ user.email }}</p>
+
+                                    <!-- Mobile Stats -->
+                                    <div class="flex flex-wrap gap-x-3 gap-y-1 mt-1 sm:hidden text-xs text-muted-foreground">
+                                        <span v-if="user.patron_tier_cents > 0">
+                                            Tier: {{ formatTier(user.patron_tier_cents) }}
+                                        </span>
+                                        <span>Monthly: {{ user.monthly_limit }}</span>
+                                        <span>Requests: {{ user.request_count }}</span>
+                                        <span v-if="user.rated_count > 0" class="flex items-center gap-1">
+                                            <ThumbsUp class="h-3 w-3" />
+                                            {{ user.up_percentage }}%
+                                        </span>
+                                    </div>
                                 </div>
-                                <p class="text-sm text-muted-foreground truncate">{{ user.email }}</p>
                             </div>
 
-                            <!-- Tier -->
-                            <div class="text-center hidden sm:block">
-                                <p class="text-xs text-muted-foreground">Tier</p>
-                                <p class="font-medium">
-                                    {{ user.patron_tier_cents > 0 ? formatTier(user.patron_tier_cents) : '-' }}
-                                </p>
+                            <!-- Desktop Stats -->
+                            <div class="hidden sm:flex items-center gap-4">
+                                <!-- Tier -->
+                                <div class="text-center">
+                                    <p class="text-xs text-muted-foreground">Tier</p>
+                                    <p class="font-medium text-sm">
+                                        {{ user.patron_tier_cents > 0 ? formatTier(user.patron_tier_cents) : '-' }}
+                                    </p>
+                                </div>
+
+                                <!-- Monthly Credits -->
+                                <div class="text-center">
+                                    <p class="text-xs text-muted-foreground">Per Month</p>
+                                    <p class="font-medium text-sm">{{ user.monthly_limit }}</p>
+                                </div>
+
+                                <!-- Request Count -->
+                                <div class="text-center">
+                                    <p class="text-xs text-muted-foreground">Requests</p>
+                                    <p class="font-medium text-sm">{{ user.request_count }}</p>
+                                </div>
+
+                                <!-- Rating -->
+                                <div v-if="user.rated_count > 0" class="text-center">
+                                    <p class="text-xs text-muted-foreground flex items-center justify-center gap-1">
+                                        <ThumbsUp class="h-3 w-3" />
+                                        Rating
+                                    </p>
+                                    <p
+                                        class="font-medium text-sm"
+                                        :class="user.up_percentage! >= 50 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                    >
+                                        {{ user.up_percentage }}%
+                                    </p>
+                                </div>
                             </div>
 
-                            <!-- Monthly Credits -->
-                            <div class="text-center hidden sm:block">
-                                <p class="text-xs text-muted-foreground">Per Month</p>
-                                <p class="font-medium">{{ user.monthly_limit }}</p>
-                            </div>
+                            <!-- Credit Balance and Actions -->
+                            <div class="flex items-center justify-between sm:justify-end gap-3">
+                                <!-- Credit Balance -->
+                                <div class="text-center sm:text-left">
+                                    <p class="text-xs text-muted-foreground">Balance</p>
+                                    <p class="font-bold text-base sm:text-lg flex items-center gap-1">
+                                        <Coins class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-yellow-500" />
+                                        {{ user.credit_balance }}
+                                    </p>
+                                </div>
 
-                            <!-- Request Count -->
-                            <div class="text-center hidden sm:block">
-                                <p class="text-xs text-muted-foreground">Requests</p>
-                                <p class="font-medium">{{ user.request_count }}</p>
-                            </div>
-
-                            <!-- Rating -->
-                            <div v-if="user.rated_count > 0" class="text-center hidden sm:block">
-                                <p class="text-xs text-muted-foreground flex items-center justify-center gap-1">
-                                    <ThumbsUp class="h-3 w-3" />
-                                    Rating
-                                </p>
-                                <p
-                                    class="font-medium"
-                                    :class="user.up_percentage! >= 50 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
-                                >
-                                    {{ user.up_percentage }}%
-                                </p>
-                            </div>
-
-                            <!-- Credit Balance -->
-                            <div class="text-center">
-                                <p class="text-xs text-muted-foreground">Balance</p>
-                                <p class="font-bold text-lg flex items-center justify-center gap-1">
-                                    <Coins class="h-4 w-4 text-yellow-500" />
-                                    {{ user.credit_balance }}
-                                </p>
-                            </div>
-
-                            <!-- Actions -->
-                            <div class="flex gap-1">
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    @click="openAdjustDialog(user, true)"
-                                >
-                                    <Plus class="h-4 w-4" />
-                                </Button>
-                                <Button
-                                    size="sm"
-                                    variant="outline"
-                                    @click="openAdjustDialog(user, false)"
-                                >
-                                    <Minus class="h-4 w-4" />
-                                </Button>
+                                <!-- Actions -->
+                                <div class="flex gap-1">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        @click="openAdjustDialog(user, true)"
+                                    >
+                                        <Plus class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                    </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        @click="openAdjustDialog(user, false)"
+                                    >
+                                        <Minus class="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     </div>

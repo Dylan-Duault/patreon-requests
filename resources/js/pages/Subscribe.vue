@@ -89,11 +89,11 @@ const breadcrumbs: BreadcrumbItem[] = [
             <div class="max-w-2xl w-full">
                 <Card>
                     <CardHeader class="text-center">
-                        <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                            <Sparkles class="h-8 w-8 text-primary" />
+                        <div class="mx-auto mb-4 flex h-14 w-14 sm:h-16 sm:w-16 items-center justify-center rounded-full bg-primary/10">
+                            <Sparkles class="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
                         </div>
-                        <CardTitle class="text-2xl">Subscribe to Request Videos</CardTitle>
-                        <CardDescription class="text-base">
+                        <CardTitle class="text-xl sm:text-2xl">Subscribe to Request Videos</CardTitle>
+                        <CardDescription class="text-sm sm:text-base">
                             Become a Patreon supporter to request YouTube videos for me to react to!
                         </CardDescription>
                     </CardHeader>

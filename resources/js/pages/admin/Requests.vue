@@ -173,7 +173,7 @@ const filterUrl = (status: string) => {
             </div>
 
             <!-- Filters -->
-            <div class="flex gap-2">
+            <div class="flex flex-wrap gap-2">
                 <Button
                     :variant="currentFilter === 'all' ? 'default' : 'outline'"
                     size="sm"
@@ -218,26 +218,26 @@ const filterUrl = (status: string) => {
                         <div
                             v-for="request in requests"
                             :key="request.id"
-                            class="flex items-start gap-4 rounded-lg border p-4"
+                            class="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4"
                         >
                             <!-- Thumbnail -->
                             <a
                                 :href="request.youtube_url"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                class="relative flex-shrink-0 group"
+                                class="relative flex-shrink-0 group w-full sm:w-auto"
                             >
                                 <img
                                     v-if="request.thumbnail"
                                     :src="request.thumbnail"
                                     :alt="request.title || 'Video thumbnail'"
-                                    class="h-24 w-44 rounded object-cover"
+                                    class="h-48 w-full sm:h-24 sm:w-44 rounded object-cover"
                                 />
                                 <div
                                     v-else
-                                    class="flex h-24 w-44 items-center justify-center rounded bg-muted"
+                                    class="flex h-48 w-full sm:h-24 sm:w-44 items-center justify-center rounded bg-muted"
                                 >
-                                    <Video class="h-8 w-8 text-muted-foreground" />
+                                    <Video class="h-12 w-12 sm:h-8 sm:w-8 text-muted-foreground" />
                                 </div>
                                 <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
                                     <ExternalLink class="h-6 w-6 text-white" />
@@ -246,23 +246,23 @@ const filterUrl = (status: string) => {
 
                             <!-- Content -->
                             <div class="flex-1 min-w-0 space-y-2">
-                                <div class="flex items-start justify-between gap-2">
-                                    <div>
+                                <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                    <div class="flex-1 min-w-0">
                                         <a
                                             :href="request.youtube_url"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            class="font-medium hover:underline line-clamp-1"
+                                            class="font-medium hover:underline line-clamp-2 text-sm sm:text-base"
                                         >
                                             {{ request.title || 'Untitled Video' }}
                                         </a>
-                                        <div class="flex items-center gap-3 text-sm text-muted-foreground">
-                                            <span>Requested {{ formatDate(request.requested_at) }}</span>
-                                            <span v-if="request.duration_seconds" class="flex items-center gap-1">
+                                        <div class="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground mt-1">
+                                            <span class="whitespace-nowrap">{{ formatDate(request.requested_at) }}</span>
+                                            <span v-if="request.duration_seconds" class="flex items-center gap-1 whitespace-nowrap">
                                                 <Clock class="h-3 w-3" />
                                                 {{ formatDuration(request.duration_seconds) }}
                                             </span>
-                                            <span class="flex items-center gap-1">
+                                            <span class="flex items-center gap-1 whitespace-nowrap">
                                                 <Coins class="h-3 w-3" />
                                                 {{ request.request_cost }} {{ request.request_cost === 1 ? 'credit' : 'credits' }}
                                             </span>
@@ -270,14 +270,15 @@ const filterUrl = (status: string) => {
                                     </div>
                                     <Badge
                                         :variant="request.status === 'done' ? 'default' : 'secondary'"
+                                        class="self-start text-xs whitespace-nowrap"
                                     >
                                         {{ request.status === 'done' ? 'Completed' : 'Pending' }}
                                     </Badge>
                                 </div>
 
                                 <!-- User Info -->
-                                <div class="flex items-center gap-2 text-sm">
-                                    <Avatar class="h-6 w-6">
+                                <div class="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                                    <Avatar class="h-5 w-5 sm:h-6 sm:w-6">
                                         <AvatarImage
                                             v-if="request.user.avatar"
                                             :src="request.user.avatar"
@@ -287,9 +288,9 @@ const filterUrl = (status: string) => {
                                             {{ getInitials(request.user.name) }}
                                         </AvatarFallback>
                                     </Avatar>
-                                    <span>{{ request.user.name }}</span>
-                                    <span class="text-muted-foreground">({{ request.user.email }})</span>
-                                    <Badge variant="outline" class="ml-auto">
+                                    <span class="font-medium">{{ request.user.name }}</span>
+                                    <span class="text-muted-foreground hidden sm:inline">({{ request.user.email }})</span>
+                                    <Badge variant="outline" class="ml-auto text-xs whitespace-nowrap">
                                         {{ formatTier(request.user.tier_cents) }}/month
                                     </Badge>
                                 </div>
@@ -297,14 +298,14 @@ const filterUrl = (status: string) => {
                                 <!-- Context -->
                                 <div
                                     v-if="request.context"
-                                    class="rounded-md bg-muted/50 p-3 text-sm"
+                                    class="rounded-md bg-muted/50 p-2 sm:p-3 text-xs sm:text-sm"
                                 >
                                     <p class="text-xs font-medium text-muted-foreground mb-1">Context</p>
                                     <p class="whitespace-pre-wrap">{{ request.context }}</p>
                                 </div>
 
                                 <!-- Actions -->
-                                <div class="flex items-center gap-2 pt-2">
+                                <div class="flex flex-wrap items-center gap-2 pt-2">
                                     <!-- Rating buttons for pending requests -->
                                     <template v-if="request.status === 'pending'">
                                         <Button
@@ -313,8 +314,8 @@ const filterUrl = (status: string) => {
                                             class="text-green-600 hover:bg-green-50 hover:text-green-700 dark:text-green-400 dark:hover:bg-green-950 dark:hover:text-green-300"
                                             @click="rateRequest(request.id, 'up')"
                                         >
-                                            <ThumbsUp class="mr-2 h-4 w-4" />
-                                            Good
+                                            <ThumbsUp class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span class="text-xs sm:text-sm">Good</span>
                                         </Button>
                                         <Button
                                             size="sm"
@@ -322,20 +323,20 @@ const filterUrl = (status: string) => {
                                             class="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-950 dark:hover:text-red-300"
                                             @click="rateRequest(request.id, 'down')"
                                         >
-                                            <ThumbsDown class="mr-2 h-4 w-4" />
-                                            Bad
+                                            <ThumbsDown class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span class="text-xs sm:text-sm">Bad</span>
                                         </Button>
                                     </template>
                                     <!-- Show rating and revert for completed requests -->
                                     <template v-else>
-                                        <div v-if="request.rating" class="flex items-center gap-1 text-sm">
+                                        <div v-if="request.rating" class="flex items-center gap-1 text-xs sm:text-sm">
                                             <ThumbsUp
                                                 v-if="request.rating === 'up'"
-                                                class="h-4 w-4 text-green-600 dark:text-green-400"
+                                                class="h-3 w-3 sm:h-4 sm:w-4 text-green-600 dark:text-green-400"
                                             />
                                             <ThumbsDown
                                                 v-else
-                                                class="h-4 w-4 text-red-600 dark:text-red-400"
+                                                class="h-3 w-3 sm:h-4 sm:w-4 text-red-600 dark:text-red-400"
                                             />
                                             <span
                                                 :class="request.rating === 'up'
@@ -345,14 +346,14 @@ const filterUrl = (status: string) => {
                                                 {{ request.rating === 'up' ? 'Good' : 'Bad' }}
                                             </span>
                                         </div>
-                                        <span v-else class="text-sm text-muted-foreground">No rating</span>
+                                        <span v-else class="text-xs sm:text-sm text-muted-foreground">No rating</span>
                                         <Button
                                             variant="outline"
                                             size="sm"
                                             @click="markAsPending(request.id)"
                                         >
-                                            <RotateCcw class="mr-2 h-4 w-4" />
-                                            Revert to Pending
+                                            <RotateCcw class="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+                                            <span class="text-xs sm:text-sm">Revert</span>
                                         </Button>
                                     </template>
                                     <Button
@@ -361,6 +362,7 @@ const filterUrl = (status: string) => {
                                         as="a"
                                         :href="request.youtube_url"
                                         target="_blank"
+                                        class="hidden sm:inline-flex"
                                     >
                                         <ExternalLink class="mr-2 h-4 w-4" />
                                         Watch Video

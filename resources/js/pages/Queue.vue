@@ -53,14 +53,14 @@ const formatDate = (dateString: string) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div>
-                    <h1 class="text-2xl font-semibold tracking-tight">Video Queue</h1>
-                    <p class="text-muted-foreground">
+                    <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">Video Queue</h1>
+                    <p class="text-sm sm:text-base text-muted-foreground">
                         All video requests waiting to be reacted to, handled in chronological order.
                     </p>
                 </div>
-                <Button as-child>
+                <Button as-child class="w-full sm:w-auto">
                     <Link href="/requests/new">
                         <Plus class="mr-2 h-4 w-4" />
                         Request Video
@@ -95,45 +95,47 @@ const formatDate = (dateString: string) => {
                         <div
                             v-for="(request, index) in requests"
                             :key="request.id"
-                            class="flex items-center gap-4 rounded-lg border p-4"
+                            class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 rounded-lg border p-3 sm:p-4"
                         >
-                            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-sm font-medium">
-                                {{ index + 1 }}
-                            </div>
-                            <a
-                                :href="request.youtube_url"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="relative flex-shrink-0 group"
-                            >
-                                <img
-                                    v-if="request.thumbnail"
-                                    :src="request.thumbnail"
-                                    :alt="request.title || 'Video thumbnail'"
-                                    class="h-20 w-36 rounded object-cover"
-                                />
-                                <div
-                                    v-else
-                                    class="flex h-20 w-36 items-center justify-center rounded bg-muted"
-                                >
-                                    <Video class="h-8 w-8 text-muted-foreground" />
+                            <div class="flex items-center gap-3 sm:gap-4">
+                                <div class="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted text-xs sm:text-sm font-medium flex-shrink-0">
+                                    {{ index + 1 }}
                                 </div>
-                                <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
-                                    <ExternalLink class="h-6 w-6 text-white" />
-                                </div>
-                            </a>
-                            <div class="flex-1 min-w-0">
                                 <a
                                     :href="request.youtube_url"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="font-medium hover:underline line-clamp-2"
+                                    class="relative flex-shrink-0 group"
                                 >
-                                    {{ request.title || 'Untitled Video' }}
+                                    <img
+                                        v-if="request.thumbnail"
+                                        :src="request.thumbnail"
+                                        :alt="request.title || 'Video thumbnail'"
+                                        class="h-16 w-28 sm:h-20 sm:w-36 rounded object-cover"
+                                    />
+                                    <div
+                                        v-else
+                                        class="flex h-16 w-28 sm:h-20 sm:w-36 items-center justify-center rounded bg-muted"
+                                    >
+                                        <Video class="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+                                    </div>
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
+                                        <ExternalLink class="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                                    </div>
                                 </a>
-                                <p class="text-sm text-muted-foreground mt-1">
-                                    Requested {{ formatDate(request.requested_at) }}
-                                </p>
+                                <div class="flex-1 min-w-0">
+                                    <a
+                                        :href="request.youtube_url"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="font-medium hover:underline line-clamp-2 text-sm sm:text-base"
+                                    >
+                                        {{ request.title || 'Untitled Video' }}
+                                    </a>
+                                    <p class="text-xs sm:text-sm text-muted-foreground mt-1">
+                                        Requested {{ formatDate(request.requested_at) }}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

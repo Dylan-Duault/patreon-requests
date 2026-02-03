@@ -91,14 +91,14 @@ const saveContext = (requestId: number) => {
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex h-full flex-1 flex-col gap-6 p-4 md:p-6">
             <!-- Header -->
-            <div class="flex items-center justify-between">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                    <h1 class="text-2xl font-semibold tracking-tight">My Requests</h1>
-                    <p class="text-muted-foreground">
+                    <h1 class="text-xl sm:text-2xl font-semibold tracking-tight">My Requests</h1>
+                    <p class="text-sm sm:text-base text-muted-foreground">
                         {{ remainingRequests }} {{ remainingRequests === 1 ? 'credit' : 'credits' }} remaining
                     </p>
                 </div>
-                <Button as-child :disabled="remainingRequests === 0">
+                <Button as-child :disabled="remainingRequests === 0" class="w-full sm:w-auto">
                     <Link href="/requests/new">
                         <Plus class="mr-2 h-4 w-4" />
                         New Request
@@ -127,26 +127,26 @@ const saveContext = (requestId: number) => {
                         <div
                             v-for="request in requests"
                             :key="request.id"
-                            class="rounded-lg border p-4"
+                            class="rounded-lg border p-3 sm:p-4"
                         >
-                            <div class="flex items-center gap-4">
+                            <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
                                 <a
                                     :href="request.youtube_url"
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    class="relative flex-shrink-0 group"
+                                    class="relative flex-shrink-0 group w-full sm:w-auto"
                                 >
                                     <img
                                         v-if="request.thumbnail"
                                         :src="request.thumbnail"
                                         :alt="request.title || 'Video thumbnail'"
-                                        class="h-20 w-36 rounded object-cover"
+                                        class="h-40 w-full sm:h-20 sm:w-36 rounded object-cover"
                                     />
                                     <div
                                         v-else
-                                        class="flex h-20 w-36 items-center justify-center rounded bg-muted"
+                                        class="flex h-40 w-full sm:h-20 sm:w-36 items-center justify-center rounded bg-muted"
                                     >
-                                        <Video class="h-8 w-8 text-muted-foreground" />
+                                        <Video class="h-12 w-12 sm:h-8 sm:w-8 text-muted-foreground" />
                                     </div>
                                     <div class="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded">
                                         <ExternalLink class="h-6 w-6 text-white" />
@@ -157,29 +157,29 @@ const saveContext = (requestId: number) => {
                                         :href="request.youtube_url"
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="font-medium hover:underline line-clamp-2"
+                                        class="font-medium hover:underline line-clamp-2 text-sm sm:text-base"
                                     >
                                         {{ request.title || 'Untitled Video' }}
                                     </a>
-                                    <p class="text-sm text-muted-foreground mt-1">
+                                    <p class="text-xs sm:text-sm text-muted-foreground mt-1">
                                         Requested {{ formatDate(request.requested_at) }}
                                     </p>
                                     <p
                                         v-if="request.status === 'pending' && request.queue_position"
-                                        class="text-sm text-muted-foreground"
+                                        class="text-xs sm:text-sm text-muted-foreground"
                                     >
                                         Position in queue: #{{ request.queue_position }}
                                     </p>
                                     <p
                                         v-if="request.completed_at"
-                                        class="text-sm text-muted-foreground"
+                                        class="text-xs sm:text-sm text-muted-foreground"
                                     >
                                         Completed {{ formatDate(request.completed_at) }}
                                     </p>
                                 </div>
                                 <Badge
                                     :variant="request.status === 'done' ? 'default' : 'secondary'"
-                                    class="flex items-center gap-1"
+                                    class="flex items-center gap-1 self-start sm:self-center text-xs whitespace-nowrap"
                                 >
                                     <CheckCircle
                                         v-if="request.status === 'done'"
