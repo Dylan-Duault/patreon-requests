@@ -24,6 +24,7 @@ interface VideoRequest {
     youtube_video_id: string;
     status: 'pending' | 'done';
     context: string | null;
+    queue_position: number | null;
     requested_at: string;
     completed_at: string | null;
 }
@@ -162,6 +163,12 @@ const saveContext = (requestId: number) => {
                                     </a>
                                     <p class="text-sm text-muted-foreground mt-1">
                                         Requested {{ formatDate(request.requested_at) }}
+                                    </p>
+                                    <p
+                                        v-if="request.status === 'pending' && request.queue_position"
+                                        class="text-sm text-muted-foreground"
+                                    >
+                                        Position in queue: #{{ request.queue_position }}
                                     </p>
                                     <p
                                         v-if="request.completed_at"

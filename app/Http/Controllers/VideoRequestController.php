@@ -200,6 +200,7 @@ class VideoRequestController extends Controller
                 'youtube_video_id' => $req->youtube_video_id,
                 'status' => $req->status,
                 'context' => $req->context,
+                'queue_position' => $req->getQueuePosition(),
                 'requested_at' => $req->requested_at->toISOString(),
                 'completed_at' => $req->completed_at?->toISOString(),
             ]);

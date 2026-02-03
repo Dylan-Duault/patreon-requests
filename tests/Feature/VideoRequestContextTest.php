@@ -173,3 +173,49 @@ describe('updating video request context', function () {
         expect($videoRequest->context)->toBe('Original context');
     });
 });
+
+describe('my requests page', function () {
+    test('includes queue position for pending requests', function () {
+        // Create 2 older pending requests from other users
+        VideoRequest::factory()->count(2)->pending()->create([
+            'requested_at' => now()->subDays(5),
+        ]);
+
+        // Create the patron's pending request (should be position 3)
+        $patronRequest = VideoRequest::factory()->pending()->create([
+            'user_id' => $this->patron->id,
+            'requested_at' => now()->subDays(3),
+        ]);
+
+        // Create a newer pending request from another user
+        VideoRequest::factory()->pending()->create([
+            'requested_at' => now()->subDay(),
+        ]);
+
+        // Create a completed request for the patron
+        $completedRequest = VideoRequest::factory()->create([
+            'user_id' => $this->patron->id,
+            'status' => 'done',
+            'requested_at' => now()->subWeek(),
+            'completed_at' => now(),
+        ]);
+
+        $response = $this->actingAs($this->patron)
+            ->get('/my-requests')
+            ->assertOk()
+            ->assertInertia(fn ($page) => $page
+                ->component('MyRequests')
+                ->has('requests', 2)
+            );
+
+        // Get the actual requests array from the response
+        $requests = $response->viewData('page')['props']['requests'];
+
+        // Find our specific requests in the array
+        $completedInResponse = collect($requests)->firstWhere('id', $completedRequest->id);
+        $pendingInResponse = collect($requests)->firstWhere('id', $patronRequest->id);
+
+        expect($completedInResponse['queue_position'])->toBeNull()
+            ->and($pendingInResponse['queue_position'])->toBe(3);
+    });
+});

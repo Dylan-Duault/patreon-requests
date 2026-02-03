@@ -103,4 +103,23 @@ class VideoRequest extends Model
             'completed_at' => $this->completed_at ?? now(),
         ]);
     }
+
+    /**
+     * Get the position of this request in the queue.
+     * Returns the position number (1-indexed) if pending, null otherwise.
+     */
+    public function getQueuePosition(): ?int
+    {
+        if (! $this->isPending()) {
+            return null;
+        }
+
+        // Count how many pending requests were requested before this one
+        $position = self::pending()
+            ->where('requested_at', '<', $this->requested_at)
+            ->count();
+
+        // Add 1 to make it 1-indexed (first request is position 1, not 0)
+        return $position + 1;
+    }
 }
