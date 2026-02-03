@@ -44,6 +44,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/requests/check', [VideoRequestController::class, 'checkVideo'])->name('requests.check');
         Route::post('/requests', [VideoRequestController::class, 'store'])->name('requests.store');
         Route::get('/my-requests', [VideoRequestController::class, 'myRequests'])->name('my-requests');
+        Route::patch('/requests/{videoRequest}/context', [VideoRequestController::class, 'updateContext'])->name('requests.update-context');
     });
 
     // Admin routes

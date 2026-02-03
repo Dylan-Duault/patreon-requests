@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdateVideoRequestContextRequest;
 use App\Models\Setting;
 use App\Models\VideoRequest;
 use App\Services\YouTubeService;
@@ -198,6 +199,7 @@ class VideoRequestController extends Controller
                 'youtube_url' => $req->youtube_url,
                 'youtube_video_id' => $req->youtube_video_id,
                 'status' => $req->status,
+                'context' => $req->context,
                 'requested_at' => $req->requested_at->toISOString(),
                 'completed_at' => $req->completed_at?->toISOString(),
             ]);
@@ -207,5 +209,17 @@ class VideoRequestController extends Controller
             'remainingRequests' => $user->getRemainingRequests(),
             'monthlyLimit' => $user->getMonthlyRequestLimit(),
         ]);
+    }
+
+    /**
+     * Update the context of a pending request.
+     */
+    public function updateContext(UpdateVideoRequestContextRequest $request, VideoRequest $videoRequest): RedirectResponse
+    {
+        $videoRequest->update([
+            'context' => $request->validated('context'),
+        ]);
+
+        return back()->with('success', 'Context updated successfully!');
     }
 }
