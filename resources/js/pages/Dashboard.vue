@@ -29,6 +29,7 @@ defineProps<{
     tierCents: number;
     monthlyLimit: number;
     remainingRequests: number;
+    showRequestList: boolean;
     recentRequests: VideoRequest[];
 }>();
 
@@ -149,7 +150,7 @@ const formatTier = (cents: number) => {
                         Subscribe to Request
                     </Link>
                 </Button>
-                <Button variant="outline" as-child v-if="isActivePatron">
+                <Button variant="outline" as-child v-if="isActivePatron && showRequestList">
                     <Link href="/requests">
                         View Queue
                     </Link>

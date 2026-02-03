@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,6 +27,7 @@ class DashboardController extends Controller
             'tierCents' => $user->patron_tier_cents,
             'monthlyLimit' => $user->getMonthlyRequestLimit(),
             'remainingRequests' => $user->getRemainingRequests(),
+            'showRequestList' => (bool) Setting::get('show_request_list', true),
             'recentRequests' => $user->requests()
                 ->latest('requested_at')
                 ->take(5)
