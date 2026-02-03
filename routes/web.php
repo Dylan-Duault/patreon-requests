@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SettingsController as AdminSettingsController;
 use App\Http\Controllers\Admin\StatisticsController as AdminStatisticsController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\VideoRequestController as AdminVideoRequestController;
@@ -55,6 +56,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/users/{user}/credits', [AdminUserController::class, 'adjustCredits'])->name('users.credits');
 
         Route::get('/statistics', [AdminStatisticsController::class, 'index'])->name('statistics.index');
+
+        Route::get('/settings', [AdminSettingsController::class, 'index'])->name('settings.index');
+        Route::patch('/settings', [AdminSettingsController::class, 'update'])->name('settings.update');
     });
 });
 

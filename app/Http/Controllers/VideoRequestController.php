@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\VideoRequest;
 use App\Services\YouTubeService;
 use Illuminate\Http\JsonResponse;
@@ -22,6 +23,10 @@ class VideoRequestController extends Controller
      */
     public function index(): Response
     {
+        if (! Setting::get('show_request_list', true)) {
+            abort(404);
+        }
+
         $requests = VideoRequest::pending()
             ->chronological()
             ->get()

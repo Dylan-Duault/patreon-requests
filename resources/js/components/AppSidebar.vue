@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { BarChart3, LayoutGrid, ListVideo, Plus, Settings, Users, Video } from 'lucide-vue-next';
+import { BarChart3, ClipboardList, LayoutGrid, ListVideo, Plus, Settings, Users, Video } from 'lucide-vue-next';
 import { computed } from 'vue';
 
 import NavFooter from '@/components/NavFooter.vue';
@@ -28,6 +28,7 @@ const { urlIsActive } = useActiveUrl();
 
 const isActivePatron = computed(() => page.props.auth.user?.is_active_patron);
 const isAdmin = computed(() => page.props.auth.user?.is_admin);
+const showRequestList = computed(() => page.props.settings?.show_request_list ?? true);
 
 const mainNavItems: NavItem[] = [
     {
@@ -39,12 +40,17 @@ const mainNavItems: NavItem[] = [
 
 const patronNavItems = computed<NavItem[]>(() => {
     if (!isActivePatron.value) return [];
-    return [
-        {
+    const items: NavItem[] = [];
+
+    if (showRequestList.value) {
+        items.push({
             title: 'Video Queue',
             href: '/requests',
             icon: ListVideo,
-        },
+        });
+    }
+
+    items.push(
         {
             title: 'New Request',
             href: '/requests/new',
@@ -54,8 +60,10 @@ const patronNavItems = computed<NavItem[]>(() => {
             title: 'My Requests',
             href: '/my-requests',
             icon: Video,
-        },
-    ];
+        }
+    );
+
+    return items;
 });
 
 const adminNavItems = computed<NavItem[]>(() => {
@@ -64,7 +72,7 @@ const adminNavItems = computed<NavItem[]>(() => {
         {
             title: 'Manage Requests',
             href: '/admin/requests',
-            icon: Settings,
+            icon: ClipboardList,
         },
         {
             title: 'Manage Users',
@@ -75,6 +83,11 @@ const adminNavItems = computed<NavItem[]>(() => {
             title: 'Statistics',
             href: '/admin/statistics',
             icon: BarChart3,
+        },
+        {
+            title: 'Settings',
+            href: '/admin/settings',
+            icon: Settings,
         },
     ];
 });

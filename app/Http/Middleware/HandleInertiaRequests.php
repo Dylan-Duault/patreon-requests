@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -59,6 +60,9 @@ class HandleInertiaRequests extends Middleware
             ],
             'patreonSubscribeUrl' => config('services.patreon.subscribe_url'),
             'creditBalance' => $user ? $user->getCreditBalance() : 0,
+            'settings' => [
+                'show_request_list' => Setting::get('show_request_list', true),
+            ],
         ];
     }
 }
