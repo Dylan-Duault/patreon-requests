@@ -38,7 +38,9 @@ class DashboardController extends Controller
                     'thumbnail' => $request->thumbnail,
                     'youtube_url' => $request->youtube_url,
                     'status' => $request->status,
+                    'queue_position' => $request->getQueuePosition(),
                     'requested_at' => $request->requested_at->toISOString(),
+                    'completed_at' => $request->completed_at?->toISOString(),
                 ]),
         ]);
     }

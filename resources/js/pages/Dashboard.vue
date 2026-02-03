@@ -12,6 +12,12 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { type BreadcrumbItem } from '@/types';
 
 interface VideoRequest {
@@ -20,7 +26,9 @@ interface VideoRequest {
     thumbnail: string | null;
     youtube_url: string;
     status: 'pending' | 'done';
+    queue_position: number | null;
     requested_at: string;
+    completed_at: string | null;
 }
 
 defineProps<{
@@ -67,7 +75,7 @@ const formatTier = (cents: number) => {
                 </h1>
                 <p class="text-muted-foreground">
                     <template v-if="isActivePatron">
-                        You're an active patron at the {{ formatTier(tierCents) }} tier.
+                        You're an active patron, thank you for supporting the channel
                     </template>
                     <template v-else>
                         Subscribe to Patreon to request videos.
@@ -172,6 +180,29 @@ const formatTier = (cents: number) => {
                             :key="request.id"
                             class="flex items-center gap-4"
                         >
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger as-child>
+                                        <div class="flex flex-col items-center justify-center w-12 h-16">
+                                            <template v-if="request.status === 'pending' && request.queue_position">
+                                                <Clock class="h-5 w-5 mb-1 text-muted-foreground" />
+                                                <span class="text-xs font-medium text-muted-foreground">#{{ request.queue_position }}</span>
+                                            </template>
+                                            <template v-else-if="request.status === 'done'">
+                                                <CheckCircle class="h-5 w-5 text-green-500" />
+                                            </template>
+                                        </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        <p v-if="request.status === 'pending' && request.queue_position">
+                                            Position #{{ request.queue_position }} in queue
+                                        </p>
+                                        <p v-else-if="request.status === 'done'">
+                                            Completed on {{ request.completed_at ? formatDate(request.completed_at) : 'N/A' }}
+                                        </p>
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
                             <img
                                 v-if="request.thumbnail"
                                 :src="request.thumbnail"
